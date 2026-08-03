@@ -1,0 +1,29 @@
+{
+  "name": "cleaning-service-platform",
+  "version": "1.0.0",
+  "description": "Backend",
+  "private": "true",
+  "homepage": "https://github.com/pbhoper/cleaning-service-platform#readme",
+  "bugs": {
+    "url": "https://github.com/pbhoper/cleaning-service-platform/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pbhoper/cleaning-service-platform.git"
+  },
+  "license": "ISC",
+  "author": "Andrey",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/typeorm": "^11.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "pg": "^8.22.0",
+    "typeorm": "^1.1.0"
+  }
+}
