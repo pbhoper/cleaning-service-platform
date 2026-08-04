@@ -7,10 +7,10 @@ import { HistoryCleanModule } from './history-clean/history-clean.module';
 import { RatedModule } from './rated/rated.module';
 import { OrderModule } from './order/order.module';
 import { EmailSmsModule } from './email-sms/email-sms.module';
-import { CliningCompanyModule } from './clining-company/clining-company.module';
+import { CleaningCompanyModule } from './clining-company/cleaning-company.module';
 
 @Module({
-  imports: [SearchModule, ToBookModule, HistoryCleanModule, RatedModule, OrderModule, EmailSmsModule, CliningCompanyModule],
+  imports: [SearchModule, ToBookModule, HistoryCleanModule, RatedModule, OrderModule, EmailSmsModule, CleaningCompanyModule],
   controllers: [AppController],
   providers: [AppService],
 })
