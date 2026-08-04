@@ -1,16 +1,23 @@
-import {IsString, IsNotEmpty, IsOptional} from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEmail,
+  MinLength
+} from 'class-validator';
 
 export class RegisterAuthDto {
   @IsString()
-  @IsNotEmpty()
-  username: string;
+  @IsOptional()
+  username?: string;
 
-  @IsString()
+  @IsEmail()
   @IsNotEmpty()
   email: string;
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(6, { message: 'Пароль должен быть не менее 6 символов' })
   password: string;
 
   @IsString()
@@ -19,5 +26,5 @@ export class RegisterAuthDto {
 
   @IsString()
   @IsOptional()
-  lastName: string;
+  lastName?: string;
 }

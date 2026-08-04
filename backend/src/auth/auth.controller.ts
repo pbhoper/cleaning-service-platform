@@ -1,34 +1,42 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Query,
+  Req
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterAuthDto } from './dto/register-auth.dto';
-import { LoginAuth } from './dto/login-auth.dto';
+import { LoginAuthDto } from './dto/login-auth.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  create(@Body() createAuthDto: RegisterAuthDto) {
-    return this.authService.create(createAuthDto);
+  @Post('register')
+  register(@Body() createAuthDto: RegisterAuthDto) {
+    return this.authService.register(createAuthDto);
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
+  @Post('login')
+  login(@Body() loginDto: LoginAuthDto) {
+    return this.authService.login(loginDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
+  @Get('confirm')
+  confirm(@Query('token') token: string) {
+    return this.authService.confirmEmail(token);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: LoginAuth) {
-    return this.authService.update(+id, updateAuthDto);
+  @Get('google')
+  async googleAuth(@Req() req) {
+
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  @Get('google/callback')
+  async googleAuthRedirect(@Req() req) {
+
+    return this.authService.socialLogin(req.user);
   }
 }

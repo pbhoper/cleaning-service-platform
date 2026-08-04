@@ -1,22 +1,38 @@
-import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column
+} from "typeorm";
 
-@Entity('auth')
+@Entity('users')
 export class Auth {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({unique: true})
-  username: string;
+  @Column({ unique: true, nullable: true })
+  username: string | null;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
-  @Column({nullable: true})
-  password: string;
+  @Column({ nullable: true })
+  password: string | null;
 
   @Column()
-  firstname: string;
+  firstName: string;
 
-  @Column()
-  lastname: string;
+  @Column({ nullable: true })
+  lastName: string | null;
+
+  @Column({ default: false })
+  isConfirmed: boolean;
+
+  @Column({ nullable: true })
+  confirmationToken: string | null;
+
+  @Column({ nullable: true })
+  provider: string | null;
+
+  @Column({ nullable: true })
+  providerId: string | null;
 }
