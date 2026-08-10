@@ -1,23 +1,32 @@
-import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn
+} from 'typeorm';
 
-@Entity()
-export class Search {
-
+@Entity('cleaning_companies')
+export class SearchEntity {
   @PrimaryGeneratedColumn()
-
-  @Column({type: 'date', nullable: true})
-  date: Date;
+  id: number;
 
   @Column()
-  position: string
+  name: string;
 
   @Column()
-  schedule: number;
+  location: string;
+
+  @Column('decimal')
+  price: number;
 
   @Column()
-  cost: number;
+  cleaningType: string;
 
   @Column()
-  type: string;
+  schedule: string;
 
+  @Column({ type: 'date', nullable: true })
+  availableDate: string;
+
+  @Column({ default: 0 })
+  rating: number;
 }

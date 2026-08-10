@@ -5,5 +5,6 @@ import { EmailSmsController } from './email-sms.controller';
 @Module({
   controllers: [EmailSmsController],
   providers: [EmailSmsService],
+  exports: [EmailSmsService],
 })
-export class EmailSmsModule {}
+export class EmailSmsModule { }

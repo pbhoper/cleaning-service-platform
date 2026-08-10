@@ -1,11 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { EmailSmsService } from './email-sms.service';
 import { CreateEmailSmDto } from './dto/create-email-sm.dto';
-import { UpdateEmailSmDto } from './dto/update-email-sm.dto';
 
 @Controller('email-sms')
 export class EmailSmsController {
-  constructor(private readonly emailSmsService: EmailSmsService) {}
+  constructor(private readonly emailSmsService: EmailSmsService) { }
 
   @Post()
   create(@Body() createEmailSmDto: CreateEmailSmDto) {
@@ -20,11 +19,6 @@ export class EmailSmsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.emailSmsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEmailSmDto: UpdateEmailSmDto) {
-    return this.emailSmsService.update(+id, updateEmailSmDto);
   }
 
   @Delete(':id')

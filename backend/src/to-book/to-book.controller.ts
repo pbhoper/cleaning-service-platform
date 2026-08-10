@@ -1,34 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get
+} from '@nestjs/common';
 import { ToBookService } from './to-book.service';
 import { CreateToBookDto } from './dto/create-to-book.dto';
-import { UpdateToBookDto } from './dto/update-to-book.dto';
 
-@Controller('to-book')
+@Controller('booking')
 export class ToBookController {
-  constructor(private readonly toBookService: ToBookService) {}
+  constructor(private readonly toBookService: ToBookService) { }
 
   @Post()
-  create(@Body() createToBookDto: CreateToBookDto) {
-    return this.toBookService.create(createToBookDto);
+  async createBooking(@Body() dto: CreateToBookDto) {
+
+    const mockClientId = 1;
+
+    return this.toBookService.createBooking(mockClientId, dto);
   }
 
-  @Get()
-  findAll() {
-    return this.toBookService.findAll();
-  }
+  @Get('my-bookings')
+  async getMyBookings() {
+    const mockClientId = 1;
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.toBookService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateToBookDto: UpdateToBookDto) {
-    return this.toBookService.update(+id, updateToBookDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.toBookService.remove(+id);
+    return this.toBookService.getClientBookings(mockClientId);
   }
 }

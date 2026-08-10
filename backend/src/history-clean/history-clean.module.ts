@@ -5,5 +5,6 @@ import { HistoryCleanController } from './history-clean.controller';
 @Module({
   controllers: [HistoryCleanController],
   providers: [HistoryCleanService],
+  exports: [HistoryCleanService],
 })
-export class HistoryCleanModule {}
+export class HistoryCleanModule { }

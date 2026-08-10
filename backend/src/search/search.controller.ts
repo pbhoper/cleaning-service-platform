@@ -1,34 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query, ValidationPipe } from '@nestjs/common';
 import { SearchService } from './search.service';
-import { CreateSearchDto } from './dto/create-search.dto';
-import { UpdateSearchDto } from './dto/update-search.dto';
+import { SearchQueryDto } from './dto/create-search.dto';
 
 @Controller('search')
 export class SearchController {
-  constructor(private readonly searchService: SearchService) {}
-
-  @Post()
-  create(@Body() createSearchDto: CreateSearchDto) {
-    return this.searchService.create(createSearchDto);
-  }
+  constructor(private readonly searchService: SearchService) { }
 
   @Get()
-  findAll() {
-    return this.searchService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.searchService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSearchDto: UpdateSearchDto) {
-    return this.searchService.update(+id, updateSearchDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.searchService.remove(+id);
+  async searchCompanies(
+    @Query(new ValidationPipe({ transform: true })) query: SearchQueryDto,
+  ) {
+    return this.searchService.findCompanies(query);
   }
 }
