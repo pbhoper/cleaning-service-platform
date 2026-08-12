@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column
 } from "typeorm";
+import {Role} from "../../user-role/enum/user-role.enum";
 
 @Entity('users')
 export class Auth {
@@ -35,4 +36,12 @@ export class Auth {
 
   @Column({ nullable: true })
   providerId: string | null;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.CLIENT,
+  })
+  role: Role;
+
 }
