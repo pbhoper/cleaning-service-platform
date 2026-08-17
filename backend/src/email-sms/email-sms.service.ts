@@ -11,8 +11,8 @@ export class EmailSmsService {
       host: 'smtp.mailtrap.io',
       port: 2525,
       auth: {
-        user: 'ваш_user',
-        pass: 'ваш_pass',
+        user: 'user',
+        pass: 'pass',
       },
     });
   }
@@ -33,8 +33,8 @@ export class EmailSmsService {
       }
     } else if (createEmailSmDto.type === 'sms') {
 
-      console.log(`[SMS] Отправка на номер ${createEmailSmDto.recipient}: ${createEmailSmDto.message}`);
-      return { success: true, message: 'SMS симуляция: отправлено!' };
+      console.log(`Отправка на номер ${createEmailSmDto.recipient}: ${createEmailSmDto.message}`);
+      return { success: true, message: 'отправлено!' };
     }
   }
 
