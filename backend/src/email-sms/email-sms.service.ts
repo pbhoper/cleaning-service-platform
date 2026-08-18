@@ -19,7 +19,6 @@ export class EmailSmsService {
 
   async create(createEmailSmDto: CreateEmailSmDto) {
     if (createEmailSmDto.type === 'email') {
-
       try {
         await this.transporter.sendMail({
           from: '"Cleaning Service" <no-reply@cleaning.com>',
@@ -27,14 +26,24 @@ export class EmailSmsService {
           subject: 'Уведомление о заказе уборки',
           text: createEmailSmDto.message,
         });
-        return { success: true, message: 'Email успешно отправлен!' };
-      } catch (error) {
-        return { success: false, error: error.message };
-      }
-    } else if (createEmailSmDto.type === 'sms') {
 
-      console.log(`Отправка на номер ${createEmailSmDto.recipient}: ${createEmailSmDto.message}`);
-      return { success: true, message: 'отправлено!' };
+        return { success: true, message: 'Email успешно отправлен!' };
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Не удалось отправить email';
+
+        return { success: false, error: message };
+      }
+    }
+
+    if (createEmailSmDto.type === 'sms') {
+      console.log(
+        `Отправка на номер ${createEmailSmDto.recipient}: ${createEmailSmDto.message}`,
+      );
+
+      return { success: true, message: 'SMS отправлено!' };
     }
   }
 
