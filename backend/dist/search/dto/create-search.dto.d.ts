@@ -1,16 +1,16 @@
-export declare enum SortOrder {
-    ASC = "ASC",
-    DESC = "DESC"
+export declare enum SortBy {
+    PRICE = "price",
+    DISTANCE = "distance",
+    RATING = "rating",
+    POPULARITY = "popularity"
 }
 export declare class SearchQueryDto {
-    location?: string;
-    date?: string;
-    schedule?: string;
-    cleaningType?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    sortBy?: string;
-    sortOrder?: SortOrder;
+    address?: string;
+    lat?: number;
+    lng?: number;
+    areaSqM?: number;
+    sortBy?: SortBy;
+    sortOrder?: 'ASC' | 'DESC';
     page?: number;
     limit?: number;
 }

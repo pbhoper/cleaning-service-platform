@@ -31,11 +31,11 @@ __decorate([
     __metadata("design:type", String)
 ], Booking.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_role_entity_1.UserRole, { eager: true }),
+    (0, typeorm_1.ManyToOne)(() => user_role_entity_1.UserRole),
     __metadata("design:type", user_role_entity_1.UserRole)
 ], Booking.prototype, "client", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_role_entity_1.UserRole, { eager: true, nullable: true }),
+    (0, typeorm_1.ManyToOne)(() => user_role_entity_1.UserRole, { nullable: true }),
     __metadata("design:type", user_role_entity_1.UserRole)
 ], Booking.prototype, "company", void 0);
 __decorate([

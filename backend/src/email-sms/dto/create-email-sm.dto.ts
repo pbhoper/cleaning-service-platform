@@ -1,8 +1,5 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsIn
-} from 'class-validator';
+import { IsNotEmpty, IsString, IsEnum } from 'class-validator';
+import { NotificationType } from '../entities/email-sm.entity';
 
 export class CreateEmailSmDto {
   @IsNotEmpty()
@@ -14,6 +11,6 @@ export class CreateEmailSmDto {
   message: string;
 
   @IsNotEmpty()
-  @IsIn(['email', 'sms'])
-  type: 'email' | 'sms';
+  @IsEnum(NotificationType)
+  type: NotificationType;
 }

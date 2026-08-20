@@ -1,80 +1,86 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SearchEntity } from './entities/search.entity';
-import { SearchQueryDto } from './dto/create-search.dto';
+import { CleaningCompanyEntity } from '../cleaning-company/entities/cleaning-company.entity';
+import {Booking} from "../booking/entities/booking.entity";
+import {SearchQueryDto, SortBy} from "./dto/create-search.dto";
 
 @Injectable()
 export class SearchService {
   constructor(
-    @InjectRepository(SearchEntity)
-    private readonly searchRepository: Repository<SearchEntity>,
-  ) { }
+    @InjectRepository(CleaningCompanyEntity)
+    private companyRepository: Repository<CleaningCompanyEntity>,
+    @InjectRepository(Booking)
+    private bookingRepository: Repository<Booking>,
+  ) {}
 
-  async findCompanies(query: SearchQueryDto) {
+  async searchCompanies(query: SearchQueryDto) {
     const {
-      location,
-      cleaningType,
-      schedule,
-      date,
-      minPrice,
-      maxPrice,
-      sortBy,
-      sortOrder = 'ASC',
+      lat,
+      lng,
+      areaSqM = 50,
+      sortBy = SortBy.RATING,
+      sortOrder = 'DESC',
       page = 1,
       limit = 10,
     } = query;
 
-    const queryBuilder = this.searchRepository.createQueryBuilder('company');
-
-    if (location) {
-      queryBuilder.andWhere('company.location ILIKE :location', { location: '%' + location + '%' });
-    }
-
-    if (cleaningType) {
-      queryBuilder.andWhere('company.cleaningType = :cleaningType', { cleaningType });
-    }
-
-    if (schedule) {
-      queryBuilder.andWhere('company.schedule = :schedule', { schedule });
-    }
-
-    if (date) {
-      queryBuilder.andWhere('company.availableDate = :date::date', { date });
-    }
-
-    if (minPrice !== undefined) {
-      queryBuilder.andWhere('company.price >= :minPrice', { minPrice });
-    }
-
-    if (maxPrice !== undefined) {
-      queryBuilder.andWhere('company.price <= :maxPrice', { maxPrice });
-    }
-
-    if (sortBy) {
-      const allowedSortFields = ['price', 'rating', 'availableDate'];
-
-      if (allowedSortFields.includes(sortBy)) {
-        queryBuilder.orderBy('company.' + sortBy, sortOrder);
-      } else {
-        throw new BadRequestException('Сортировка по данному полю не поддерживается');
-      }
-    } else {
-      queryBuilder.orderBy('company.id', 'DESC');
-    }
-
     const skip = (page - 1) * limit;
-    queryBuilder.skip(skip).take(limit);
 
-    const [data, total] = await queryBuilder.getManyAndCount();
+    const qb = this.companyRepository
+      .createQueryBuilder('company')
+      .leftJoin('bookings', 'booking', 'booking.companyId = company.id')
+      .select([
+        'company.id AS id',
+        'company.name AS name',
+        'company.logo AS logo',
+        'company.address AS address',
+        'company.rating AS rating',
+        'company.pricePerSqM AS "pricePerSqM"',
+      ])
+      .addSelect('COUNT(booking.id)', 'popularity')
+      .groupBy('company.id');
+
+    if (lat && lng) {
+      qb.addSelect(
+        `(6371 * acos(cos(radians(:lat)) * cos(radians(company.latitude)) * cos(radians(company.longitude) - radians(:lng)) + sin(radians(:lat)) * sin(radians(company.latitude))))`,
+        'distance',
+      ).setParameters({ lat, lng });
+    }
+
+    if (sortBy === SortBy.POPULARITY) {
+      qb.orderBy('popularity', sortOrder);
+    } else if (sortBy === SortBy.PRICE) {
+      qb.orderBy('company.pricePerSqM', sortOrder);
+    } else if (sortBy === SortBy.DISTANCE && lat && lng) {
+      qb.orderBy('distance', sortOrder === 'DESC' ? 'DESC' : 'ASC');
+    } else {
+      qb.orderBy('company.rating', sortOrder);
+    }
+
+    qb.offset(skip).limit(limit);
+
+    const rawItems = await qb.getRawMany();
+    const total = await this.companyRepository.count();
+
+    const items = rawItems.map((c) => ({
+      id: c.id,
+      name: c.name,
+      logo: c.logo || null,
+      address: c.address || '',
+      rating: Number(c.rating || 0),
+      estimatedPrice: Number(c.pricePerSqM || 0) * areaSqM,
+      distanceKm: c.distance ? Number(Number(c.distance).toFixed(1)) : null,
+      popularity: Number(c.popularity || 0),
+    }));
 
     return {
-      data,
+      items,
       meta: {
         total,
         page,
         limit,
-        lastPage: Math.ceil(total / limit),
+        hasMore: skip + items.length < total,
       },
     };
   }

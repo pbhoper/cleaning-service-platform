@@ -17,6 +17,11 @@ let CleaningCompanyEntity = class CleaningCompanyEntity {
     email;
     phone;
     address;
+    logo;
+    rating;
+    pricePerSqM;
+    latitude;
+    longitude;
     isCorporate;
     createdAt;
     updatedAt;
@@ -42,6 +47,26 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], CleaningCompanyEntity.prototype, "address", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], CleaningCompanyEntity.prototype, "logo", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { precision: 3, scale: 2, default: 0.0 }),
+    __metadata("design:type", Number)
+], CleaningCompanyEntity.prototype, "rating", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 2, default: 100.0 }),
+    __metadata("design:type", Number)
+], CleaningCompanyEntity.prototype, "pricePerSqM", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 6, nullable: true }),
+    __metadata("design:type", Number)
+], CleaningCompanyEntity.prototype, "latitude", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 6, nullable: true }),
+    __metadata("design:type", Number)
+], CleaningCompanyEntity.prototype, "longitude", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)

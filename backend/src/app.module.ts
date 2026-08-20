@@ -9,6 +9,8 @@ import { OrderModule } from './order/order.module';
 import { EmailSmsModule } from './email-sms/email-sms.module';
 import {CleaningCompanyModule} from "./cleaning-company/cleaning-company.module";
 import {TypeOrmModule} from "@nestjs/typeorm";
+import {AuthModule} from "./auth/auth.module";
+import {UserRoleModule} from "./user-role/user-role.module";
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import {TypeOrmModule} from "@nestjs/typeorm";
       autoLoadEntities: true,
       synchronize: true,
     }),
+    AuthModule,
+    UserRoleModule,
     SearchModule,
     ToBookModule,
     HistoryCleanModule,

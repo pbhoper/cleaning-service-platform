@@ -1,12 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateEmailSmDto } from './dto/create-email-sm.dto';
+import {
+  EmailSmsEntity,
+  NotificationType,
+  NotificationStatus,
+} from './entities/email-sm.entity';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailSmsService {
   private transporter;
 
-  constructor() {
+  constructor(
+    @InjectRepository(EmailSmsEntity)
+    private readonly emailSmsRepository: Repository<EmailSmsEntity>,
+  ) {
     this.transporter = nodemailer.createTransport({
       host: 'smtp.mailtrap.io',
       port: 2525,
@@ -18,44 +28,60 @@ export class EmailSmsService {
   }
 
   async create(createEmailSmDto: CreateEmailSmDto) {
-    if (createEmailSmDto.type === 'email') {
+    const { type, recipient, message } = createEmailSmDto;
+
+    let status = NotificationStatus.SUCCESS;
+    let errorMessage: string | undefined = undefined;
+
+    if (type === 'email') {
       try {
         await this.transporter.sendMail({
           from: '"Cleaning Service" <no-reply@cleaning.com>',
-          to: createEmailSmDto.recipient,
+          to: recipient,
           subject: 'Уведомление о заказе уборки',
-          text: createEmailSmDto.message,
+          text: message,
         });
-
-        return { success: true, message: 'Email успешно отправлен!' };
       } catch (error: unknown) {
-        const message =
+        status = NotificationStatus.FAILED;
+        errorMessage =
           error instanceof Error
             ? error.message
             : 'Не удалось отправить email';
-
-        return { success: false, error: message };
       }
+    } else if (type === 'sms') {
+      console.log(`Отправка SMS на номер ${recipient}: ${message}`);
     }
 
-    if (createEmailSmDto.type === 'sms') {
-      console.log(
-        `Отправка на номер ${createEmailSmDto.recipient}: ${createEmailSmDto.message}`,
-      );
+    const notification = this.emailSmsRepository.create({
+      type: type as NotificationType,
+      recipient,
+      message,
+      status,
+      errorMessage,
+    });
 
-      return { success: true, message: 'SMS отправлено!' };
+    return await this.emailSmsRepository.save(notification);
+  }
+
+  async findAll() {
+    return await this.emailSmsRepository.find({
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async findOne(id: number) {
+    const notification = await this.emailSmsRepository.findOneBy({ id });
+    if (!notification) {
+      throw new NotFoundException(`Уведомление #${id} не найдено`);
     }
+    return notification;
   }
 
-  findAll() {
-    return 'Возврат истории всех сообщений';
-  }
-
-  findOne(id: number) {
-    return `Сообщение с ID #${id}`;
-  }
-
-  remove(id: number) {
-    return `Удаление сообщения #${id}`;
+  async remove(id: number) {
+    const result = await this.emailSmsRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Уведомление #${id} не найдено`);
+    }
+    return { success: true, message: `Сообщение #${id} удалено` };
   }
 }

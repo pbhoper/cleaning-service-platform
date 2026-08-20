@@ -21,6 +21,6 @@ export class UserRole {
   @Column({ nullable: true })
   description: string;
 
-  @ManyToOne(() => UserRole, { eager: true })
+  @ManyToOne(() => UserRole)
   role: UserRole;
 }

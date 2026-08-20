@@ -10,11 +10,14 @@ exports.EmailSmsModule = void 0;
 const common_1 = require("@nestjs/common");
 const email_sms_service_1 = require("./email-sms.service");
 const email_sms_controller_1 = require("./email-sms.controller");
+const typeorm_1 = require("@nestjs/typeorm");
+const email_sm_entity_1 = require("./entities/email-sm.entity");
 let EmailSmsModule = class EmailSmsModule {
 };
 exports.EmailSmsModule = EmailSmsModule;
 exports.EmailSmsModule = EmailSmsModule = __decorate([
     (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([email_sm_entity_1.EmailSmsEntity])],
         controllers: [email_sms_controller_1.EmailSmsController],
         providers: [email_sms_service_1.EmailSmsService],
         exports: [email_sms_service_1.EmailSmsService],

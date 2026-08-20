@@ -21,17 +21,17 @@ let SearchController = class SearchController {
     constructor(searchService) {
         this.searchService = searchService;
     }
-    async searchCompanies(query) {
-        return this.searchService.findCompanies(query);
+    searchCompanies(query) {
+        return this.searchService.searchCompanies(query);
     }
 };
 exports.SearchController = SearchController;
 __decorate([
     (0, common_1.Get)(),
-    __param(0, (0, common_1.Query)(new common_1.ValidationPipe({ transform: true }))),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_search_dto_1.SearchQueryDto]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], SearchController.prototype, "searchCompanies", null);
 exports.SearchController = SearchController = __decorate([
     (0, common_1.Controller)('search'),

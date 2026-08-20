@@ -4,6 +4,11 @@ export declare class CleaningCompanyEntity {
     email: string;
     phone: string;
     address: string;
+    logo: string;
+    rating: number;
+    pricePerSqM: number;
+    latitude: number;
+    longitude: number;
     isCorporate: boolean;
     createdAt: Date;
     updatedAt: Date;

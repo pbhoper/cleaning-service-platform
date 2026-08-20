@@ -8,19 +8,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchModule = void 0;
 const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
 const search_service_1 = require("./search.service");
 const search_controller_1 = require("./search.controller");
-const typeorm_1 = require("@nestjs/typeorm");
-const search_entity_1 = require("./entities/search.entity");
+const cleaning_company_entity_1 = require("../cleaning-company/entities/cleaning-company.entity");
+const booking_entity_1 = require("../booking/entities/booking.entity");
 let SearchModule = class SearchModule {
 };
 exports.SearchModule = SearchModule;
 exports.SearchModule = SearchModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([search_entity_1.SearchEntity])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([cleaning_company_entity_1.CleaningCompanyEntity, booking_entity_1.Booking])],
         controllers: [search_controller_1.SearchController],
         providers: [search_service_1.SearchService],
-        exports: [search_service_1.SearchService]
+        exports: [search_service_1.SearchService],
     })
 ], SearchModule);
 //# sourceMappingURL=search.module.js.map

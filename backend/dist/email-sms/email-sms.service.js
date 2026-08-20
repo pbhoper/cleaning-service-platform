@@ -41,13 +41,21 @@ var __importStar = (this && this.__importStar) || (function () {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmailSmsService = void 0;
 const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
+const email_sm_entity_1 = require("./entities/email-sm.entity");
 const nodemailer = __importStar(require("nodemailer"));
 let EmailSmsService = class EmailSmsService {
+    emailSmsRepository;
     transporter;
-    constructor() {
+    constructor(emailSmsRepository) {
+        this.emailSmsRepository = emailSmsRepository;
         this.transporter = nodemailer.createTransport({
             host: 'smtp.mailtrap.io',
             port: 2525,
@@ -58,41 +66,62 @@ let EmailSmsService = class EmailSmsService {
         });
     }
     async create(createEmailSmDto) {
-        if (createEmailSmDto.type === 'email') {
+        const { type, recipient, message } = createEmailSmDto;
+        let status = email_sm_entity_1.NotificationStatus.SUCCESS;
+        let errorMessage = undefined;
+        if (type === 'email') {
             try {
                 await this.transporter.sendMail({
                     from: '"Cleaning Service" <no-reply@cleaning.com>',
-                    to: createEmailSmDto.recipient,
+                    to: recipient,
                     subject: 'Уведомление о заказе уборки',
-                    text: createEmailSmDto.message,
+                    text: message,
                 });
-                return { success: true, message: 'Email успешно отправлен!' };
             }
             catch (error) {
-                const message = error instanceof Error
-                    ? error.message
-                    : 'Не удалось отправить email';
-                return { success: false, error: message };
+                status = email_sm_entity_1.NotificationStatus.FAILED;
+                errorMessage =
+                    error instanceof Error
+                        ? error.message
+                        : 'Не удалось отправить email';
             }
         }
-        if (createEmailSmDto.type === 'sms') {
-            console.log(`Отправка на номер ${createEmailSmDto.recipient}: ${createEmailSmDto.message}`);
-            return { success: true, message: 'SMS отправлено!' };
+        else if (type === 'sms') {
+            console.log(`Отправка SMS на номер ${recipient}: ${message}`);
         }
+        const notification = this.emailSmsRepository.create({
+            type: type,
+            recipient,
+            message,
+            status,
+            errorMessage,
+        });
+        return await this.emailSmsRepository.save(notification);
     }
-    findAll() {
-        return 'Возврат истории всех сообщений';
+    async findAll() {
+        return await this.emailSmsRepository.find({
+            order: { createdAt: 'DESC' },
+        });
     }
-    findOne(id) {
-        return `Сообщение с ID #${id}`;
+    async findOne(id) {
+        const notification = await this.emailSmsRepository.findOneBy({ id });
+        if (!notification) {
+            throw new common_1.NotFoundException(`Уведомление #${id} не найдено`);
+        }
+        return notification;
     }
-    remove(id) {
-        return `Удаление сообщения #${id}`;
+    async remove(id) {
+        const result = await this.emailSmsRepository.delete(id);
+        if (result.affected === 0) {
+            throw new common_1.NotFoundException(`Уведомление #${id} не найдено`);
+        }
+        return { success: true, message: `Сообщение #${id} удалено` };
     }
 };
 exports.EmailSmsService = EmailSmsService;
 exports.EmailSmsService = EmailSmsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __param(0, (0, typeorm_1.InjectRepository)(email_sm_entity_1.EmailSmsEntity)),
+    __metadata("design:paramtypes", [typeorm_2.Repository])
 ], EmailSmsService);
 //# sourceMappingURL=email-sms.service.js.map

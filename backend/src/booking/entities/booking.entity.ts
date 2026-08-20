@@ -13,10 +13,10 @@ export class Booking {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => UserRole, { eager: true })
+  @ManyToOne(() => UserRole)
   client: UserRole;
 
-  @ManyToOne(() => UserRole, { eager: true, nullable: true })
+  @ManyToOne(() => UserRole, { nullable: true })
   company: UserRole;
 
   @Column()

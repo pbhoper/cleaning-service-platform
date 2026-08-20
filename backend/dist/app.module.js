@@ -18,6 +18,8 @@ const order_module_1 = require("./order/order.module");
 const email_sms_module_1 = require("./email-sms/email-sms.module");
 const cleaning_company_module_1 = require("./cleaning-company/cleaning-company.module");
 const typeorm_1 = require("@nestjs/typeorm");
+const auth_module_1 = require("./auth/auth.module");
+const user_role_module_1 = require("./user-role/user-role.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -34,6 +36,8 @@ exports.AppModule = AppModule = __decorate([
                 autoLoadEntities: true,
                 synchronize: true,
             }),
+            auth_module_1.AuthModule,
+            user_role_module_1.UserRoleModule,
             search_module_1.SearchModule,
             to_book_module_1.ToBookModule,
             history_clean_module_1.HistoryCleanModule,

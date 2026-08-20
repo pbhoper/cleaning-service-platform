@@ -31,7 +31,7 @@ __decorate([
     __metadata("design:type", Number)
 ], Auth.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ unique: true, nullable: true }),
+    (0, typeorm_1.Column)({ type: 'varchar', unique: true, nullable: true }),
     __metadata("design:type", Object)
 ], Auth.prototype, "username", void 0);
 __decorate([
@@ -39,7 +39,7 @@ __decorate([
     __metadata("design:type", String)
 ], Auth.prototype, "email", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
     __metadata("design:type", Object)
 ], Auth.prototype, "password", void 0);
 __decorate([
@@ -47,7 +47,7 @@ __decorate([
     __metadata("design:type", String)
 ], Auth.prototype, "firstName", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
     __metadata("design:type", Object)
 ], Auth.prototype, "lastName", void 0);
 __decorate([
@@ -55,15 +55,15 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Auth.prototype, "isConfirmed", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
     __metadata("design:type", Object)
 ], Auth.prototype, "confirmationToken", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
     __metadata("design:type", Object)
 ], Auth.prototype, "provider", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.Column)({ type: 'varchar', nullable: true }),
     __metadata("design:type", Object)
 ], Auth.prototype, "providerId", void 0);
 __decorate([

@@ -36,7 +36,7 @@ __decorate([
     __metadata("design:type", String)
 ], UserRole.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => UserRole, { eager: true }),
+    (0, typeorm_1.ManyToOne)(() => UserRole),
     __metadata("design:type", UserRole)
 ], UserRole.prototype, "role", void 0);
 exports.UserRole = UserRole = __decorate([

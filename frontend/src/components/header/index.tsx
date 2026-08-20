@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import styles from './header.module.css';
-import {LoginModal} from "../auth/login-modal.tsx";
-import {BookingModal} from "../booking/booking-modal.tsx";
+import { LoginModal } from "../auth/login-modal.tsx";
+import { BookingModal } from "../booking/booking-modal.tsx";
+import {UserProfile} from "./user-profile.tsx";
 
 export const Header = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -19,19 +20,8 @@ export const Header = () => {
         <a href="#contacts">Контакты</a>
       </nav>
 
-      <div style={{ display: 'flex', gap: '12px' }}>
-
-        <button
-          className={styles.ctaButton}
-          style={{
-            backgroundColor: 'transparent',
-            color: '#0284c7',
-            border: '1px solid #0284c7',
-          }}
-          onClick={() => setIsAuthOpen(true)}
-        >
-          Войти
-        </button>
+      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <UserProfile onOpenLogin={() => setIsAuthOpen(true)} />
 
         <button
           className={styles.ctaButton}

@@ -9,23 +9,23 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQueryDto = exports.SortOrder = void 0;
+exports.SearchQueryDto = exports.SortBy = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
-var SortOrder;
-(function (SortOrder) {
-    SortOrder["ASC"] = "ASC";
-    SortOrder["DESC"] = "DESC";
-})(SortOrder || (exports.SortOrder = SortOrder = {}));
+var SortBy;
+(function (SortBy) {
+    SortBy["PRICE"] = "price";
+    SortBy["DISTANCE"] = "distance";
+    SortBy["RATING"] = "rating";
+    SortBy["POPULARITY"] = "popularity";
+})(SortBy || (exports.SortBy = SortBy = {}));
 class SearchQueryDto {
-    location;
-    date;
-    schedule;
-    cleaningType;
-    minPrice;
-    maxPrice;
-    sortBy;
-    sortOrder = SortOrder.ASC;
+    address;
+    lat;
+    lng;
+    areaSqM = 50;
+    sortBy = SortBy.RATING;
+    sortOrder = 'DESC';
     page = 1;
     limit = 10;
 }
@@ -34,55 +34,44 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], SearchQueryDto.prototype, "location", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsDateString)(),
-    __metadata("design:type", String)
-], SearchQueryDto.prototype, "date", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], SearchQueryDto.prototype, "schedule", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], SearchQueryDto.prototype, "cleaningType", void 0);
+], SearchQueryDto.prototype, "address", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Type)(() => Number),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
-], SearchQueryDto.prototype, "minPrice", void 0);
+], SearchQueryDto.prototype, "lat", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Type)(() => Number),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
-], SearchQueryDto.prototype, "maxPrice", void 0);
+], SearchQueryDto.prototype, "lng", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsIn)(['price', 'rating', 'availableDate']),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], SearchQueryDto.prototype, "areaSqM", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(SortBy),
     __metadata("design:type", String)
 ], SearchQueryDto.prototype, "sortBy", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsEnum)(SortOrder),
+    (0, class_validator_1.IsEnum)(['ASC', 'DESC']),
     __metadata("design:type", String)
 ], SearchQueryDto.prototype, "sortOrder", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Type)(() => Number),
-    (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
 ], SearchQueryDto.prototype, "page", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Type)(() => Number),
-    (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
 ], SearchQueryDto.prototype, "limit", void 0);
