@@ -2,7 +2,7 @@
   "name": "cleaning-service-platform",
   "version": "1.0.0",
   "description": "Backend",
-  "private": "true",
+  "private": true,
   "homepage": "https://github.com/pbhoper/cleaning-service-platform#readme",
   "bugs": {
     "url": "https://github.com/pbhoper/cleaning-service-platform/issues"
@@ -49,7 +49,6 @@
     "@types/node": "^26.2.0",
     "@types/nodemailer": "^8.0.1",
     "@types/passport-jwt": "^4.0.1",
-    "@types/uuid": "^10.0.0",
     "ts-node": "^10.9.2",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   }

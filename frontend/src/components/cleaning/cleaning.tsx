@@ -40,18 +40,17 @@ interface CompanySelectionModalProps {
 }
 
 export const CompanySelectionModal: React.FC<CompanySelectionModalProps> = ({
-                                                                              open,
-                                                                              bookingData,
-                                                                              onBack,
-                                                                              onSuccess,
-                                                                              onOpenLogin,
-                                                                            }) => {
+  open,
+  bookingData,
+  onBack,
+  onSuccess,
+  onOpenLogin,
+  }) => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<string>('rating');
-
   const [activeCompany, setActiveCompany] = useState<Company | null>(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState<boolean>(false);
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false);

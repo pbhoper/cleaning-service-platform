@@ -15,9 +15,10 @@ export const Header = () => {
       </div>
 
       <nav className={styles.nav}>
-        <a href="#main">Главная</a>
+        <a href="/">Главная</a>
         <a href="#services">Услуги</a>
         <a href="#contacts">Контакты</a>
+        <a href="/reports">Оставить Отзыв</a>
       </nav>
 
       <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>

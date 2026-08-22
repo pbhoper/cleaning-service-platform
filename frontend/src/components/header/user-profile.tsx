@@ -1,26 +1,27 @@
 import React from 'react';
 import { Dropdown, Avatar, Space, Button, message, type MenuProps } from 'antd';
 import { UserOutlined, LogoutOutlined, HistoryOutlined, SettingOutlined } from '@ant-design/icons';
+import { Link, useNavigate } from '@tanstack/react-router';
 
 interface UserProfileProps {
   onOpenLogin: () => void;
 }
 
 export const UserProfile: React.FC<UserProfileProps> = ({ onOpenLogin }) => {
+  const navigate = useNavigate();
   const token = localStorage.getItem('access_token');
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     message.success('Вы вышли из системы');
-    window.location.reload();
+    navigate({ to: '/' });
   };
 
   const items: MenuProps['items'] = [
     {
       key: 'profile',
       icon: <UserOutlined />,
-      label: 'Мой профиль',
-      onClick: () => message.info('Раздел профиля добавим позже'),
+      label: <Link to="/profile">Мой профиль</Link>,
     },
     {
       key: 'orders',

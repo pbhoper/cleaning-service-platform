@@ -24,7 +24,7 @@ import {CompanySelectionModal} from "../cleaning/cleaning.tsx";
 const { Title } = Typography;
 const { Option } = Select;
 
-export const types = [
+export const cleaningTypes = [
   'Стандартная уборка помещений',
   'Генеральная уборка',
   'Уборка после ремонта и строительства',
@@ -43,15 +43,14 @@ interface BookingModalProps {
 }
 
 export const BookingModal: React.FC<BookingModalProps> = ({
-                                                            open,
-                                                            onClose,
-                                                            selectedCompany = null,
-                                                            onOpenLogin,
-                                                          }) => {
+  open,
+  onClose,
+  selectedCompany = null,
+  onOpenLogin,
+  }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [recurrence, setRecurrence] = useState<string>('ONCE');
-
   const [companiesModalOpen, setCompaniesModalOpen] = useState<boolean>(false);
   const [bookingData, setBookingData] = useState<any>(null);
 
@@ -171,7 +170,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             rules={[{ required: true, message: 'Выберите тип уборки' }]}
           >
             <Select placeholder="Выберите нужный тип уборки">
-              {types.map((type) => (
+              {cleaningTypes.map((type) => (
                 <Option key={type} value={type}>
                   {type}
                 </Option>
