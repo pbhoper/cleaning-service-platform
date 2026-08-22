@@ -3,9 +3,9 @@ import {
   IsOptional,
   IsString
 } from 'class-validator';
-import {Role} from "../enum/user-role.enum";
+import {Role} from "../enum/user.enum";
 
-export class CreateUserRoleDto {
+export class CreateUserDto {
   @IsEnum(Role, { message: 'Указана недопустимая роль' })
   name: Role;
 

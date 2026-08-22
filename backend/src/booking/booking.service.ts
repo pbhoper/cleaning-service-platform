@@ -6,8 +6,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Booking } from './entities/booking.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
-import { UserRole} from "../user-role/entities/user-role.entity";
-import {BookingStatus} from "./enum/booking.enum";
+import { UserRole} from "../user-role/entities/user.entity";
+import {BOOKING_STATUS, BookingStatus} from "./consts/booking.enum";
 
 @Injectable()
 export class BookingService {
@@ -21,7 +21,7 @@ export class BookingService {
       ...createBookingDto,
       client,
       scheduledAt: new Date(createBookingDto.scheduledAt),
-      status: BookingStatus.PENDING,
+      status: BOOKING_STATUS.PENDING,
     });
 
     return await this.bookingRepository.save(booking);
@@ -32,7 +32,7 @@ export class BookingService {
       return await this.bookingRepository.find();
     }
     if (user.role.name === 'CLEANING_SERVICE') {
-      return await this.bookingRepository.find({ where: [{ company: { id: user.id } }, { status: BookingStatus.PENDING }] });
+      return await this.bookingRepository.find({ where: [{ company: { id: user.id } }, { status: BOOKING_STATUS.PENDING }] });
     }
     return await this.bookingRepository.find({ where: { client: { id: user.id } } });
   }
@@ -44,7 +44,7 @@ export class BookingService {
       throw new NotFoundException('Бронирование не найдено');
     }
 
-    if (booking.status === BookingStatus.CANCELED || booking.status === BookingStatus.COMPLETED) {
+    if (booking.status === BOOKING_STATUS.CANCELED || booking.status === BOOKING_STATUS.COMPLETED) {
       throw new BadRequestException('Нельзя изменить статус завершенного или отмененного заказа');
     }
 

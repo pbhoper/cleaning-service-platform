@@ -8,9 +8,17 @@ export const Route = createRootRoute({
 
 function RootLayout() {
   return (
-    <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', color: '#0f172a' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        backgroundColor: '#f1f5f9',
+        color: '#0f172a',
+      }}
+    >
       <Header />
-      <main>
+      <main style={{ flex: 1 }}>
         <Outlet />
       </main>
       <Footer />

@@ -5,8 +5,8 @@ import {
   UpdateDateColumn,
   ManyToOne
 } from 'typeorm';
-import { UserRole} from "../../user-role/entities/user-role.entity";
-import {BookingStatus} from "../enum/booking.enum";
+import { UserRole} from "../../user-role/entities/user.entity";
+import * as bookingEnum from "../consts/booking.enum";
 
 @Entity('bookings')
 export class Booking {
@@ -16,24 +16,24 @@ export class Booking {
   @ManyToOne(() => UserRole)
   client: UserRole;
 
-  @ManyToOne(() => UserRole, { nullable: true })
+  @ManyToOne(() => UserRole, {nullable: true})
   company: UserRole;
 
   @Column()
   address: string;
 
-  @Column('decimal', { precision: 8, scale: 2 })
+  @Column('decimal', {precision: 8, scale: 2})
   areaSqM: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column('decimal', {precision: 10, scale: 2})
   totalPrice: number;
 
   @Column({
     type: 'enum',
-    enum: BookingStatus,
-    default: BookingStatus.PENDING,
+    enum: bookingEnum.BOOKING_STATUS,
+    default: bookingEnum.BOOKING_STATUS.PENDING,
   })
-  status: BookingStatus;
+  status: bookingEnum.BookingStatus;
 
   @Column({ type: 'timestamp' })
   scheduledAt: Date;

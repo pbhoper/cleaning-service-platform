@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dropdown, Avatar, Space, Button, message, type MenuProps } from 'antd';
-import { UserOutlined, LogoutOutlined, HistoryOutlined, SettingOutlined } from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined, HistoryOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from '@tanstack/react-router';
 
 interface UserProfileProps {
@@ -24,16 +24,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({ onOpenLogin }) => {
       label: <Link to="/profile">Мой профиль</Link>,
     },
     {
-      key: 'orders',
+      key: 'history',
       icon: <HistoryOutlined />,
-      label: 'Мои заказы',
-      onClick: () => message.info('Раздел заказов добавим позже'),
-    },
-    {
-      key: 'settings',
-      icon: <SettingOutlined />,
-      label: 'Настройки',
-      onClick: () => message.info('Настройки добавим позже'),
+      label: <Link to="/history">Мои заказы</Link>,
     },
     {
       type: 'divider',

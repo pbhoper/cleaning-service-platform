@@ -1,10 +1,9 @@
 import { Controller, Post, Get, Body, Param } from '@nestjs/common';
-import { RatedService } from './rated.service';
-import { RatingItem } from './rated.service';
+import { RatingService } from './rating.service';
 
-@Controller('rated')
-export class RatedController {
-  constructor(private readonly ratedService: RatedService) { }
+@Controller('rating')
+export class RatingController {
+  constructor(private readonly ratedService: RatingService) { }
 
   @Post()
   async rateCompany(@Body() body: { clientId: string; companyId: string; rating: number; comment?: string }) {

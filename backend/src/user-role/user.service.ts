@@ -5,19 +5,19 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserRole } from './entities/user-role.entity';
-import { CreateUserRoleDto } from './dto/create-user-role.dto';
-import { UpdateUserRoleDto } from './dto/update-user-role.dto';
-import {Role} from "./enum/user-role.enum";
+import { UserRole } from './entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import {Role} from "./enum/user.enum";
 
 @Injectable()
-export class UserRoleService {
+export class UserService {
   constructor(
     @InjectRepository(UserRole)
     private readonly userRoleRepository: Repository<UserRole>,
   ) {}
 
-  async create(createUserRoleDto: CreateUserRoleDto): Promise<UserRole> {
+  async create(createUserRoleDto: CreateUserDto): Promise<UserRole> {
     const existingRole = await this.userRoleRepository.findOne({
       where: { name: createUserRoleDto.name },
     });
@@ -42,7 +42,7 @@ export class UserRoleService {
     return role;
   }
 
-  async update(id: number, updateUserRoleDto: UpdateUserRoleDto): Promise<UserRole> {
+  async update(id: number, updateUserRoleDto: UpdateUserDto): Promise<UserRole> {
     const role = await this.findOne(id);
     Object.assign(role, updateUserRoleDto);
     return await this.userRoleRepository.save(role);

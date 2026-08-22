@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { EmailSmsService } from './email-sms.service';
 import { CreateEmailSmDto } from './dto/create-email-sm.dto';
 

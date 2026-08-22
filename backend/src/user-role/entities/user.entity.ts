@@ -4,7 +4,7 @@ import {
   Column,
   ManyToOne
 } from 'typeorm';
-import {Role} from "../enum/user-role.enum";
+import {Role} from "../enum/user.enum";
 
 @Entity('user_roles')
 export class UserRole {

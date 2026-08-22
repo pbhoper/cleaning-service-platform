@@ -10,16 +10,17 @@ import {
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
-import {BookingStatus} from "./enum/booking.enum";
-import {Role} from "../user-role/enum/user-role.enum";
+import {Role} from "../user-role/enum/user.enum";
 import {Roles} from "../user-role/guards/roles.decorator";
 import {RolesGuard} from "../user-role/guards/roles.guards";
+import * as bookingEnum from "./consts/booking.enum";
 
 
 @Controller('bookings')
 @UseGuards(RolesGuard)
 export class BookingController {
-  constructor(private readonly bookingService: BookingService) {}
+  constructor(private readonly bookingService: BookingService) {
+  }
 
   @Post()
   @Roles(Role.CLIENT)
@@ -36,7 +37,7 @@ export class BookingController {
   @Roles(Role.CLEANING_SERVICE)
   updateStatus(
     @Param('id') id: string,
-    @Body('status') status: BookingStatus,
+    @Body('status') status: bookingEnum.BookingStatus,
     @Request() req,
   ) {
     return this.bookingService.updateStatus(id, status, req.user);

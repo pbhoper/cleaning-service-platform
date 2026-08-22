@@ -10,7 +10,7 @@ export interface RatingItem {
 }
 
 @Injectable()
-export class RatedService {
+export class RatingService {
 
   private readonly ratings: RatingItem[] = [];
 

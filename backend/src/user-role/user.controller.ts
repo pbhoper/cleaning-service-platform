@@ -8,16 +8,16 @@ import {
   Delete,
   ParseIntPipe
 } from '@nestjs/common';
-import { UserRoleService } from './user-role.service';
-import { CreateUserRoleDto } from './dto/create-user-role.dto';
-import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { UserService } from './user.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user-role')
-export class UserRoleController {
-  constructor(private readonly userRoleService: UserRoleService) {}
+export class UserController {
+  constructor(private readonly userRoleService: UserService) {}
 
   @Post()
-  create(@Body() createUserRoleDto: CreateUserRoleDto) {
+  create(@Body() createUserRoleDto: CreateUserDto) {
     return this.userRoleService.create(createUserRoleDto);
   }
 
@@ -32,7 +32,7 @@ export class UserRoleController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateUserRoleDto: UpdateUserRoleDto) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateUserRoleDto: UpdateUserDto) {
     return this.userRoleService.update(id, updateUserRoleDto);
   }
 
