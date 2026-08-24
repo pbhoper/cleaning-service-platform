@@ -17,11 +17,13 @@ import {
   Alert,
   Card,
 } from 'antd';
-import { GoogleOutlined, FacebookOutlined, LoginOutlined } from '@ant-design/icons';
+import { LoginOutlined, ShopOutlined, ClockCircleOutlined, DollarOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import {CompanySelectionModal} from "../cleaning/cleaning.tsx";
+import { CompanySelectionModal } from "../cleaning/cleaning.tsx";
+import { useNavigate } from "@tanstack/react-router";
+import {calculateCleaning} from "../../utils/cleaning-calculator.ts";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
 
 export const cleaningTypes = [
@@ -48,6 +50,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   selectedCompany = null,
   onOpenLogin,
   }) => {
+  const navigate = useNavigate();
+
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [recurrence, setRecurrence] = useState<string>('ONCE');
@@ -55,6 +59,15 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [bookingData, setBookingData] = useState<any>(null);
 
   const isLoggedIn = !!localStorage.getItem('access_token');
+  const smallRooms = Form.useWatch('smallRooms', form) || 0;
+  const largeRooms = Form.useWatch('largeRooms', form) || 0;
+  const bathrooms = Form.useWatch('bathrooms', form) || 0;
+  const cleaningType = Form.useWatch('cleaningType', form) || 'Стандартная уборка помещений';
+
+  const estimate = calculateCleaning(
+    { smallRooms, largeRooms, bathrooms },
+    cleaningType
+  );
 
   useEffect(() => {
     if (open && isLoggedIn) {
@@ -75,6 +88,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       ...values,
       date: values.date?.format('YYYY-MM-DD'),
       startTime: values.startTime?.format('HH:mm'),
+      calculatedPrice: estimate.totalPrice,
+      estimatedTimeMinutes: estimate.totalTimeMinutes,
     };
 
     if (selectedCompany) {
@@ -133,11 +148,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   >
                     Войти / Регистрация
                   </Button>
-                  <Button size="small" icon={<GoogleOutlined />} onClick={() => message.info('Вход через Google')}>
-                    Google
-                  </Button>
-                  <Button size="small" icon={<FacebookOutlined />} onClick={() => message.info('Вход через Facebook')}>
-                    Facebook
+
+                  <Button
+                    size="small"
+                    icon={<ShopOutlined />}
+                    onClick={() => {
+                      onClose();
+                      navigate({ to: '/cleaning-company' });
+                    }}
+                  >
+                    Я — клининговая компания
                   </Button>
                 </div>
               </div>
@@ -151,6 +171,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           onFinish={handleSubmit}
           initialValues={{
             recurrence: 'ONCE',
+            cleaningType: 'Стандартная уборка помещений',
             smallRooms: 1,
             largeRooms: 0,
             bathrooms: 1,
@@ -181,19 +202,44 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           <Card title="Описание помещения" size="small" style={{ marginBottom: 16, background: '#fafafa' }}>
             <Row gutter={12}>
               <Col span={8}>
-                <Form.Item name="smallRooms" label="Маленькие комнаты" rules={[{ required: true }]}>
+                <Form.Item name="smallRooms" label="Маленькие комнаты (до 20 кв.м)" rules={[{ required: true }]}>
                   <InputNumber min={0} style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={8}>
-                <Form.Item name="largeRooms" label="Большие комнаты" rules={[{ required: true }]}>
+                <Form.Item name="largeRooms" label="Большие комнаты (более 20 кв.м)" rules={[{ required: true }]}>
                   <InputNumber min={0} style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={8}>
-                <Form.Item name="bathrooms" label="Санузлы" rules={[{ required: true }]}>
+                <Form.Item name="bathrooms" label="Санузлы (совмещенные)" rules={[{ required: true }]}>
                   <InputNumber min={1} style={{ width: '100%' }} />
                 </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+
+          <Card style={{ marginBottom: 16, background: '#f6ffed', borderColor: '#b7eb8f' }}>
+            <Row justify="space-between" align="middle">
+              <Col>
+                <Space>
+                  <ClockCircleOutlined style={{ color: '#52c41a', fontSize: 18 }} />
+                  <Text type="secondary">Ориентировочное время:</Text>
+                </Space>
+                <div>
+                  <Text strong style={{ fontSize: 16 }}>{estimate.formattedTime}</Text>
+                </div>
+              </Col>
+              <Col style={{ textAlign: 'right' }}>
+                <Space>
+                  <DollarOutlined style={{ color: '#52c41a', fontSize: 18 }} />
+                  <Text type="secondary">Предварительная стоимость:</Text>
+                </Space>
+                <div>
+                  <Text strong style={{ fontSize: 20, color: '#52c41a' }}>
+                    {estimate.totalPrice.toLocaleString('ru-RU')} ₽
+                  </Text>
+                </div>
               </Col>
             </Row>
           </Card>

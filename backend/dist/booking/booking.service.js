@@ -17,7 +17,7 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const booking_entity_1 = require("./entities/booking.entity");
-const booking_enum_1 = require("./enum/booking.enum");
+const booking_enum_1 = require("./consts/booking.enum");
 let BookingService = class BookingService {
     bookingRepository;
     constructor(bookingRepository) {
@@ -28,7 +28,7 @@ let BookingService = class BookingService {
             ...createBookingDto,
             client,
             scheduledAt: new Date(createBookingDto.scheduledAt),
-            status: booking_enum_1.BookingStatus.PENDING,
+            status: booking_enum_1.BOOKING_STATUS.PENDING,
         });
         return await this.bookingRepository.save(booking);
     }
@@ -37,7 +37,7 @@ let BookingService = class BookingService {
             return await this.bookingRepository.find();
         }
         if (user.role.name === 'CLEANING_SERVICE') {
-            return await this.bookingRepository.find({ where: [{ company: { id: user.id } }, { status: booking_enum_1.BookingStatus.PENDING }] });
+            return await this.bookingRepository.find({ where: [{ company: { id: user.id } }, { status: booking_enum_1.BOOKING_STATUS.PENDING }] });
         }
         return await this.bookingRepository.find({ where: { client: { id: user.id } } });
     }
@@ -46,7 +46,7 @@ let BookingService = class BookingService {
         if (!booking) {
             throw new common_1.NotFoundException('Бронирование не найдено');
         }
-        if (booking.status === booking_enum_1.BookingStatus.CANCELED || booking.status === booking_enum_1.BookingStatus.COMPLETED) {
+        if (booking.status === booking_enum_1.BOOKING_STATUS.CANCELED || booking.status === booking_enum_1.BOOKING_STATUS.COMPLETED) {
             throw new common_1.BadRequestException('Нельзя изменить статус завершенного или отмененного заказа');
         }
         booking.status = status;

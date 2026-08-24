@@ -13,13 +13,13 @@ const app_service_1 = require("./app.service");
 const search_module_1 = require("./search/search.module");
 const to_book_module_1 = require("./to-book/to-book.module");
 const history_clean_module_1 = require("./history-clean/history-clean.module");
-const rated_module_1 = require("./rated/rated.module");
 const order_module_1 = require("./order/order.module");
 const email_sms_module_1 = require("./email-sms/email-sms.module");
 const cleaning_company_module_1 = require("./cleaning-company/cleaning-company.module");
 const typeorm_1 = require("@nestjs/typeorm");
 const auth_module_1 = require("./auth/auth.module");
-const user_role_module_1 = require("./user-role/user-role.module");
+const user_module_1 = require("./user-role/user.module");
+const rating_module_1 = require("./rating/rating.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -37,11 +37,11 @@ exports.AppModule = AppModule = __decorate([
                 synchronize: true,
             }),
             auth_module_1.AuthModule,
-            user_role_module_1.UserRoleModule,
+            user_module_1.UserModule,
             search_module_1.SearchModule,
             to_book_module_1.ToBookModule,
             history_clean_module_1.HistoryCleanModule,
-            rated_module_1.RatedModule,
+            rating_module_1.RatingModule,
             order_module_1.OrderModule,
             email_sms_module_1.EmailSmsModule,
             cleaning_company_module_1.CleaningCompanyModule,

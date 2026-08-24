@@ -3,16 +3,22 @@ import {
   IsNotEmpty,
   IsString,
   IsOptional,
-  IsBoolean
+  IsArray,
+  IsObject,
+  MinLength,
 } from 'class-validator';
 
 export class CreateCleaningCompanyDto {
   @IsString()
-  @IsNotEmpty({ message: 'Имя не должно быть пустым' })
+  @IsNotEmpty({ message: 'Название компании обязательно' })
   name: string;
 
   @IsEmail({}, { message: 'Некорректный формат email' })
   email: string;
+
+  @IsString()
+  @MinLength(6, { message: 'Пароль должен быть не менее 6 символов' })
+  password: string;
 
   @IsString()
   @IsNotEmpty({ message: 'Телефон обязателен' })
@@ -22,7 +28,27 @@ export class CreateCleaningCompanyDto {
   @IsOptional()
   address?: string;
 
-  @IsBoolean()
+  @IsString()
   @IsOptional()
-  isCorporate?: boolean;
+  description?: string;
+
+  @IsString()
+  @IsOptional()
+  logo?: string;
+
+  @IsArray()
+  @IsNotEmpty({ message: 'Выберите хотя бы один тип оказываемых услуг' })
+  serviceTypes: string[];
+
+  @IsObject()
+  @IsNotEmpty()
+  basePrices: {
+    smallRoom: number;
+    largeRoom: number;
+    bathroom: number;
+  };
+
+  @IsObject()
+  @IsNotEmpty()
+  coefficients: Record<string, number>;
 }

@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { Link } from '@tanstack/react-router';
 import styles from './header.module.css';
 import { LoginModal } from "../auth/login-modal.tsx";
 import { BookingModal } from "../booking/booking-modal.tsx";
-import {UserProfile} from "./user-profile.tsx";
+import { UserProfile } from "./user-profile.tsx";
 
 export const Header = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -15,10 +16,10 @@ export const Header = () => {
       </div>
 
       <nav className={styles.nav}>
-        <a href="/">Главная</a>
+        <Link to="/">Главная</Link>
         <a href="#services">Услуги</a>
         <a href="#contacts">Контакты</a>
-        <a href="/reports">Оставить Отзыв</a>
+        <Link to="/reports">Оставить Отзыв</Link>
       </nav>
 
       <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>

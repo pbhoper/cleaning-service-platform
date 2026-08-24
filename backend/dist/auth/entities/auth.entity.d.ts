@@ -1,4 +1,4 @@
-import { Role } from "../../user-role/enum/user-role.enum";
+import { Role } from "../../user-role/enum/user.enum";
 export declare class Auth {
     id: number;
     username: string | null;

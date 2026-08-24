@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import { Modal, Form, Input, Button, message, Divider, Typography } from 'antd';
-import { MailOutlined, LockOutlined, UserOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import {
+  MailOutlined,
+  LockOutlined,
+  UserOutlined,
+  ArrowRightOutlined,
+  ShopOutlined,
+} from '@ant-design/icons';
 import axios from 'axios';
+import { useNavigate } from '@tanstack/react-router';
 
 const { Title, Text } = Typography;
 
@@ -15,6 +22,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose, onGuestBo
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   const handleFinish = async (values: any) => {
     setLoading(true);
@@ -52,7 +60,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose, onGuestBo
       const serverMessage = error.response?.data?.message;
       const errorText = Array.isArray(serverMessage)
         ? serverMessage.join(', ')
-        : (serverMessage || 'Ошибка при отправке данных. Проверьте введенные поля.');
+        : serverMessage || 'Ошибка при отправке данных. Проверьте введенные поля.';
 
       message.error(errorText);
     } finally {
@@ -65,15 +73,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose, onGuestBo
     form.resetFields();
   };
 
+  const handleCompanyRegister = () => {
+    onClose();
+    navigate({ to: '/cleaning-company' });
+  };
+
   return (
-    <Modal
-      open={open}
-      onCancel={onClose}
-      footer={null}
-      centered
-      width={380}
-      destroyOnClose
-    >
+    <Modal open={open} onCancel={onClose} footer={null} centered width={380} destroyOnClose>
       <div style={{ textAlign: 'center', marginBottom: 20 }}>
         <Title level={4} style={{ marginBottom: 4 }}>
           {isRegister ? 'Регистрация' : 'Вход в систему'}
@@ -85,12 +91,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose, onGuestBo
         </Text>
       </div>
 
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleFinish}
-        size="large"
-      >
+      <Form form={form} layout="vertical" onFinish={handleFinish} size="large">
         {isRegister && (
           <>
             <Form.Item
@@ -101,10 +102,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose, onGuestBo
               <Input prefix={<UserOutlined />} placeholder="Иван" />
             </Form.Item>
 
-            <Form.Item
-              name="lastName"
-              label="Фамилия (необязательно)"
-            >
+            <Form.Item name="lastName" label="Фамилия (необязательно)">
               <Input prefix={<UserOutlined />} placeholder="Иванов" />
             </Form.Item>
           </>
@@ -141,25 +139,38 @@ export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose, onGuestBo
 
       <div style={{ textAlign: 'center', marginBottom: 12 }}>
         <Button type="link" onClick={toggleMode} style={{ padding: 0 }}>
-          {isRegister
-            ? 'Уже есть аккаунт? Войти'
-            : 'Ещё нет аккаунта? Зарегистрироваться'}
+          {isRegister ? 'Уже есть аккаунт? Войти' : 'Ещё нет аккаунта? Зарегистрироваться'}
         </Button>
       </div>
 
-      <Divider style={{ margin: '16px 0' }}>Или</Divider>
-
-      <Button
-        type="dashed"
-        block
-        icon={<ArrowRightOutlined />}
-        onClick={() => {
-          onClose();
-          if (onGuestBooking) onGuestBooking();
-        }}
-      >
-        Забронировать без входа
-      </Button>
+      {isRegister ? (
+        <>
+          <Divider style={{ margin: '12px 0' }}>Для сотрудничества с нами</Divider>
+          <Button
+            type="default"
+            block
+            icon={<ShopOutlined />}
+            onClick={handleCompanyRegister}
+          >
+            Регистрация компании
+          </Button>
+        </>
+      ) : (
+        <>
+          <Divider style={{ margin: '16px 0' }}>Или</Divider>
+          <Button
+            type="dashed"
+            block
+            icon={<ArrowRightOutlined />}
+            onClick={() => {
+              onClose();
+              if (onGuestBooking) onGuestBooking();
+            }}
+          >
+            Забронировать без входа
+          </Button>
+        </>
+      )}
     </Modal>
   );
 };
