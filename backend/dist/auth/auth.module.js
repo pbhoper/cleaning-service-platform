@@ -15,6 +15,7 @@ const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("./auth.controller");
 const auth_entity_1 = require("./entities/auth.entity");
 const jwt_strategy_1 = require("./jwt/jwt.strategy");
+const cleaning_company_module_1 = require("../cleaning-company/cleaning-company.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -27,6 +28,7 @@ exports.AuthModule = AuthModule = __decorate([
                 secret: process.env.JWT_SECRET || 'SUPER_SECRET_KEY',
                 signOptions: { expiresIn: '1d' },
             }),
+            cleaning_company_module_1.CleaningCompanyModule,
         ],
         controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],

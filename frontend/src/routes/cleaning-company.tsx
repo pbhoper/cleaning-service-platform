@@ -11,7 +11,6 @@ import {
   InputNumber,
   Row,
   Col,
-  Result,
   Divider,
 } from 'antd';
 import {
@@ -23,7 +22,8 @@ import {
   SendOutlined,
 } from '@ant-design/icons';
 import { api } from '../api/axios';
-import {cleaningTypes} from "../components/booking/booking-modal.tsx";
+import { cleaningTypes } from '../components/booking/booking-modal.tsx';
+import { CompanyDashboard } from '../components/profiles/company-profile.tsx';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -34,8 +34,10 @@ export const Route = createFileRoute('/cleaning-company')({
 function CleaningCompanyRegisterPage() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [registeredCompany,] = useState<any>(null);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+
+  const isAlreadyCompany = localStorage.getItem('user_role') === 'company';
 
   const handleFinish = async (values: any) => {
     if (values.password !== values.confirmPassword) {
@@ -43,8 +45,13 @@ function CleaningCompanyRegisterPage() {
       return;
     }
 
-    if (values.priceBathroom <= values.priceLargeRoom || values.priceLargeRoom <= values.priceSmallRoom) {
-      message.error('Стоимость санузла должна быть выше большой комнаты, а большая комната — выше маленькой!');
+    if (
+      values.priceBathroom <= values.priceLargeRoom ||
+      values.priceLargeRoom <= values.priceSmallRoom
+    ) {
+      message.error(
+        'Стоимость санузла должна быть выше большой комнаты, а большая комната — выше маленькой!'
+      );
       return;
     }
 
@@ -67,8 +74,15 @@ function CleaningCompanyRegisterPage() {
         coefficients: values.coefficients || {},
       };
 
-      await api.post('/cleaning-company', payload);
-      setIsSubmitted(true);
+      const response = await api.post('/cleaning-company', payload);
+
+      const token = response.data?.token || 'fake_company_token';
+      localStorage.setItem('access_token', token);
+      localStorage.setItem('user_role', 'company');
+
+      message.success('Компания успешно зарегистрирована!');
+
+      window.location.href = '/cleaning-company';
     } catch (error: any) {
       const serverMessage = error.response?.data?.message;
       const errorText = Array.isArray(serverMessage)
@@ -80,41 +94,56 @@ function CleaningCompanyRegisterPage() {
     }
   };
 
-  if (isSubmitted) {
-    return (
-      <div style={{ maxWidth: 600, margin: '60px auto', padding: '0 16px' }}>
-        <Result
-          status="success"
-          title="Регистрация успешно завершена, мы вам перезвоним!"
-          subTitle="На указанную электронную почту отправлено письмо со ссылкой для подтверждения. Ссылка действительна в течение 8 часов."
-        />
-      </div>
-    );
+  if (isAlreadyCompany || registeredCompany) {
+    return <CompanyDashboard initialCompanyData={registeredCompany} />;
   }
 
   return (
     <div style={{ maxWidth: 800, margin: '40px auto', padding: '0 16px' }}>
-      <Card bordered={false} style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.08)', borderRadius: 12 }}>
+      <Card
+        bordered={false}
+        style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.08)', borderRadius: 12 }}
+      >
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <Title level={3}>Регистрация клининговой службы</Title>
-          <Text type="secondary">Заполните данные компании для начала работы на платформе</Text>
+          <Text type="secondary">
+            Заполните данные компании для начала работы на платформе
+          </Text>
         </div>
 
         <Form form={form} layout="vertical" onFinish={handleFinish} size="large">
           <Title level={5}>Основные данные</Title>
           <Row gutter={16}>
             <Col xs={24} md={12}>
-              <Form.Item name="name" label="Название компании" rules={[{ required: true, message: 'Введите название' }]}>
+              <Form.Item
+                name="name"
+                label="Название компании"
+                rules={[{ required: true, message: 'Введите название' }]}
+              >
                 <Input prefix={<ShopOutlined />} placeholder="ООО Чистый Дом" />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email', message: 'Введите корректный email' }]}>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  {
+                    required: true,
+                    type: 'email',
+                    message: 'Введите корректный email',
+                  },
+                ]}
+              >
                 <Input prefix={<MailOutlined />} placeholder="company@clean.ru" />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item name="phone" label="Телефон" rules={[{ required: true, message: 'Введите телефон' }]}>
+              <Form.Item
+                name="phone"
+                label="Телефон"
+                rules={[{ required: true, message: 'Введите телефон' }]}
+              >
                 <Input prefix={<PhoneOutlined />} placeholder="+7 (999) 000-00-00" />
               </Form.Item>
             </Col>
@@ -135,7 +164,11 @@ function CleaningCompanyRegisterPage() {
 
           <Row gutter={16}>
             <Col xs={24} md={12}>
-              <Form.Item name="password" label="Пароль" rules={[{ required: true, min: 6, message: 'Минимум 6 символов' }]}>
+              <Form.Item
+                name="password"
+                label="Пароль"
+                rules={[{ required: true, min: 6, message: 'Минимум 6 символов' }]}
+              >
                 <Input.Password prefix={<LockOutlined />} placeholder="Пароль" />
               </Form.Item>
             </Col>
@@ -221,7 +254,13 @@ function CleaningCompanyRegisterPage() {
           )}
 
           <Form.Item style={{ marginTop: 24, marginBottom: 0 }}>
-            <Button type="primary" htmlType="submit" block loading={loading} icon={<SendOutlined />}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              loading={loading}
+              icon={<SendOutlined />}
+            >
               Зарегистрироваться
             </Button>
           </Form.Item>

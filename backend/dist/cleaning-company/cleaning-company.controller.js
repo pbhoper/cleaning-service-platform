@@ -16,26 +16,16 @@ exports.CleaningCompanyController = void 0;
 const common_1 = require("@nestjs/common");
 const cleaning_company_service_1 = require("./cleaning-company.service");
 const create_cleaning_company_dto_1 = require("./dto/create-cleaning-company.dto");
-const update_cleaning_company_dto_1 = require("./dto/update-cleaning-company.dto");
 let CleaningCompanyController = class CleaningCompanyController {
-    cleaningCompanyService;
-    constructor(cleaningCompanyService) {
-        this.cleaningCompanyService = cleaningCompanyService;
+    companyService;
+    constructor(companyService) {
+        this.companyService = companyService;
     }
-    create(createCleaningCompanyDto) {
-        return this.cleaningCompanyService.create(createCleaningCompanyDto);
+    async register(dto) {
+        return this.companyService.create(dto);
     }
-    findAll() {
-        return this.cleaningCompanyService.findAll();
-    }
-    findOne(id) {
-        return this.cleaningCompanyService.findOne(id);
-    }
-    update(id, updateCleaningCompanyDto) {
-        return this.cleaningCompanyService.update(id, updateCleaningCompanyDto);
-    }
-    remove(id) {
-        return this.cleaningCompanyService.remove(id);
+    async getProfile(id) {
+        return this.companyService.findById(id);
     }
 };
 exports.CleaningCompanyController = CleaningCompanyController;
@@ -44,37 +34,15 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_cleaning_company_dto_1.CreateCleaningCompanyDto]),
-    __metadata("design:returntype", void 0)
-], CleaningCompanyController.prototype, "create", null);
-__decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], CleaningCompanyController.prototype, "findAll", null);
+    __metadata("design:returntype", Promise)
+], CleaningCompanyController.prototype, "register", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
-], CleaningCompanyController.prototype, "findOne", null);
-__decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_cleaning_company_dto_1.UpdateCleaningCompanyDto]),
-    __metadata("design:returntype", void 0)
-], CleaningCompanyController.prototype, "update", null);
-__decorate([
-    (0, common_1.Delete)(':id'),
-    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
-    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
-], CleaningCompanyController.prototype, "remove", null);
+    __metadata("design:returntype", Promise)
+], CleaningCompanyController.prototype, "getProfile", null);
 exports.CleaningCompanyController = CleaningCompanyController = __decorate([
     (0, common_1.Controller)('cleaning-company'),
     __metadata("design:paramtypes", [cleaning_company_service_1.CleaningCompanyService])

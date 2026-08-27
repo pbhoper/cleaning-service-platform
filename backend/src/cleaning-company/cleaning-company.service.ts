@@ -1,55 +1,65 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException
- } from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from 'typeorm';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 import {CleaningCompanyEntity} from "./entities/cleaning-company.entity";
 import {CreateCleaningCompanyDto} from "./dto/create-cleaning-company.dto";
-import {UpdateCleaningCompanyDto} from "./dto/update-cleaning-company.dto";
 
 @Injectable()
 export class CleaningCompanyService {
   constructor(
     @InjectRepository(CleaningCompanyEntity)
-    private readonly cleaningRepository: Repository<CleaningCompanyEntity>
-  ) {
-  }
+    private readonly companyRepository: Repository<CleaningCompanyEntity>,
+    private readonly jwtService: JwtService,
+  ) {}
 
-
-  async create(createCleaningDto: CreateCleaningCompanyDto): Promise<CleaningCompanyEntity> {
-    const existing = await this.cleaningRepository.findOne({
-      where: {email: createCleaningDto.email}
+  async create(dto: CreateCleaningCompanyDto) {
+    const existing = await this.companyRepository.findOne({
+      where: { email: dto.email },
     });
+
     if (existing) {
-      throw new ConflictException('Компания с таким email уже существует');
+      throw new ConflictException('Компания с таким email уже зарегистрирована');
     }
 
-    const company = this.cleaningRepository.create(createCleaningDto);
-    return await this.cleaningRepository.save(company);
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    const company = this.companyRepository.create({
+      ...dto,
+      password: hashedPassword,
+      role: 'company',
+    });
+
+    const savedCompany = await this.companyRepository.save(company);
+
+    const payload = {
+      sub: savedCompany.id,
+      email: savedCompany.email,
+      role: savedCompany.role,
+    };
+
+    const token = this.jwtService.sign(payload);
+
+    const { password, ...companyData } = savedCompany;
+
+    return {
+      token,
+      access_token: token,
+      user_role: savedCompany.role,
+      company: companyData,
+    };
   }
 
-  async findAll(): Promise<CleaningCompanyEntity[]> {
-    return await this.cleaningRepository.find();
+  async findByEmail(email: string): Promise<CleaningCompanyEntity | null> {
+    return this.companyRepository.findOne({ where: { email } });
   }
 
-  async findOne(id: number): Promise<CleaningCompanyEntity> {
-    const company = await this.cleaningRepository.findOne({where: {id}});
+  async findById(id: number): Promise<CleaningCompanyEntity> {
+    const company = await this.companyRepository.findOne({ where: { id } });
     if (!company) {
-      throw new NotFoundException(`Компания с ID #${id} не найден`);
+      throw new NotFoundException('Компания не найдена');
     }
     return company;
-  }
-
-  async update(id: number, updateCleaningDto: UpdateCleaningCompanyDto): Promise<CleaningCompanyEntity> {
-    const company = await this.findOne(id);
-    Object.assign(company, updateCleaningDto);
-    return await this.cleaningRepository.save(company);
-  }
-
-  async remove(id: number): Promise<void> {
-    const company = await this.findOne(id);
-    await this.cleaningRepository.remove(company);
   }
 }

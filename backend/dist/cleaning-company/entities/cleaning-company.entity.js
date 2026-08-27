@@ -15,14 +15,16 @@ let CleaningCompanyEntity = class CleaningCompanyEntity {
     id;
     name;
     email;
+    password;
     phone;
     address;
+    description;
     logo;
+    serviceTypes;
+    basePrices;
+    coefficients;
+    role;
     rating;
-    pricePerSqM;
-    latitude;
-    longitude;
-    isCorporate;
     createdAt;
     updatedAt;
 };
@@ -42,35 +44,43 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
+], CleaningCompanyEntity.prototype, "password", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
 ], CleaningCompanyEntity.prototype, "phone", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], CleaningCompanyEntity.prototype, "address", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    __metadata("design:type", String)
+], CleaningCompanyEntity.prototype, "description", void 0);
+__decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], CleaningCompanyEntity.prototype, "logo", void 0);
 __decorate([
-    (0, typeorm_1.Column)('decimal', { precision: 3, scale: 2, default: 0.0 }),
+    (0, typeorm_1.Column)('simple-array', { nullable: true }),
+    __metadata("design:type", Array)
+], CleaningCompanyEntity.prototype, "serviceTypes", void 0);
+__decorate([
+    (0, typeorm_1.Column)('json', { nullable: true }),
+    __metadata("design:type", Object)
+], CleaningCompanyEntity.prototype, "basePrices", void 0);
+__decorate([
+    (0, typeorm_1.Column)('json', { nullable: true }),
+    __metadata("design:type", Object)
+], CleaningCompanyEntity.prototype, "coefficients", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'company' }),
+    __metadata("design:type", String)
+], CleaningCompanyEntity.prototype, "role", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { precision: 3, scale: 2, default: 5.0 }),
     __metadata("design:type", Number)
 ], CleaningCompanyEntity.prototype, "rating", void 0);
-__decorate([
-    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 2, default: 100.0 }),
-    __metadata("design:type", Number)
-], CleaningCompanyEntity.prototype, "pricePerSqM", void 0);
-__decorate([
-    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 6, nullable: true }),
-    __metadata("design:type", Number)
-], CleaningCompanyEntity.prototype, "latitude", void 0);
-__decorate([
-    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 6, nullable: true }),
-    __metadata("design:type", Number)
-], CleaningCompanyEntity.prototype, "longitude", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ default: false }),
-    __metadata("design:type", Boolean)
-], CleaningCompanyEntity.prototype, "isCorporate", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
@@ -80,6 +90,6 @@ __decorate([
     __metadata("design:type", Date)
 ], CleaningCompanyEntity.prototype, "updatedAt", void 0);
 exports.CleaningCompanyEntity = CleaningCompanyEntity = __decorate([
-    (0, typeorm_1.Entity)('clients')
+    (0, typeorm_1.Entity)('cleaning_companies')
 ], CleaningCompanyEntity);
 //# sourceMappingURL=cleaning-company.entity.js.map

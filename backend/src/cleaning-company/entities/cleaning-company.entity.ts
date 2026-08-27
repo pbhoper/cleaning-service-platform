@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('clients')
+@Entity('cleaning_companies')
 export class CleaningCompanyEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -18,28 +18,38 @@ export class CleaningCompanyEntity {
   email: string;
 
   @Column()
+  password: string;
+
+  @Column()
   phone: string;
 
   @Column({ nullable: true })
   address: string;
 
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
   @Column({ nullable: true })
   logo: string;
 
-  @Column('decimal', { precision: 3, scale: 2, default: 0.0 })
+  @Column('simple-array', { nullable: true })
+  serviceTypes: string[];
+
+  @Column('json', { nullable: true })
+  basePrices: {
+    smallRoom: number;
+    largeRoom: number;
+    bathroom: number;
+  };
+
+  @Column('json', { nullable: true })
+  coefficients: Record<string, number>;
+
+  @Column({ default: 'company' })
+  role: string;
+
+  @Column('decimal', { precision: 3, scale: 2, default: 5.0 })
   rating: number;
-
-  @Column('decimal', { precision: 10, scale: 2, default: 100.0 })
-  pricePerSqM: number;
-
-  @Column('decimal', { precision: 10, scale: 6, nullable: true })
-  latitude: number;
-
-  @Column('decimal', { precision: 10, scale: 6, nullable: true })
-  longitude: number;
-
-  @Column({ default: false })
-  isCorporate: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

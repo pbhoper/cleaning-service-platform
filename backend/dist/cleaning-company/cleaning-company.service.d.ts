@@ -1,13 +1,36 @@
 import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 import { CleaningCompanyEntity } from "./entities/cleaning-company.entity";
 import { CreateCleaningCompanyDto } from "./dto/create-cleaning-company.dto";
-import { UpdateCleaningCompanyDto } from "./dto/update-cleaning-company.dto";
 export declare class CleaningCompanyService {
-    private readonly cleaningRepository;
-    constructor(cleaningRepository: Repository<CleaningCompanyEntity>);
-    create(createCleaningDto: CreateCleaningCompanyDto): Promise<CleaningCompanyEntity>;
-    findAll(): Promise<CleaningCompanyEntity[]>;
-    findOne(id: number): Promise<CleaningCompanyEntity>;
-    update(id: number, updateCleaningDto: UpdateCleaningCompanyDto): Promise<CleaningCompanyEntity>;
-    remove(id: number): Promise<void>;
+    private readonly companyRepository;
+    private readonly jwtService;
+    constructor(companyRepository: Repository<CleaningCompanyEntity>, jwtService: JwtService);
+    create(dto: CreateCleaningCompanyDto): Promise<{
+        token: string;
+        access_token: string;
+        user_role: string;
+        company: {
+            id: number;
+            name: string;
+            email: string;
+            phone: string;
+            address: string;
+            description: string;
+            logo: string;
+            serviceTypes: string[];
+            basePrices: {
+                smallRoom: number;
+                largeRoom: number;
+                bathroom: number;
+            };
+            coefficients: Record<string, number>;
+            role: string;
+            rating: number;
+            createdAt: Date;
+            updatedAt: Date;
+        };
+    }>;
+    findByEmail(email: string): Promise<CleaningCompanyEntity | null>;
+    findById(id: number): Promise<CleaningCompanyEntity>;
 }

@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 import styles from './header.module.css';
 import { LoginModal } from "../auth/login-modal.tsx";
 import { BookingModal } from "../booking/booking-modal.tsx";
-import { UserProfile } from "./user-profile.tsx";
+import { UserProfile } from "../profiles/user-profile.tsx";
 
 export const Header = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);

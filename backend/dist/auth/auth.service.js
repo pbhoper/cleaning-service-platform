@@ -53,12 +53,15 @@ const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcrypt"));
 const uuid_1 = require("uuid");
 const auth_entity_1 = require("./entities/auth.entity");
+const cleaning_company_service_1 = require("../cleaning-company/cleaning-company.service");
 let AuthService = class AuthService {
     authRepository;
     jwtService;
-    constructor(authRepository, jwtService) {
+    cleaningCompanyService;
+    constructor(authRepository, jwtService, cleaningCompanyService) {
         this.authRepository = authRepository;
         this.jwtService = jwtService;
+        this.cleaningCompanyService = cleaningCompanyService;
     }
     async register(dto) {
         const existingUser = await this.authRepository.findOne({ where: { email: dto.email } });
@@ -79,17 +82,28 @@ let AuthService = class AuthService {
     }
     async login(dto) {
         const user = await this.authRepository.findOne({ where: { email: dto.email } });
-        if (!user || !user.password) {
-            throw new common_1.UnauthorizedException('Неверные учетные данные');
+        if (user) {
+            if (!user.password) {
+                throw new common_1.UnauthorizedException('Неверные учетные данные');
+            }
+            const isPasswordValid = await bcrypt.compare(dto.password, user.password);
+            if (!isPasswordValid) {
+                throw new common_1.UnauthorizedException('Неверные учетные данные');
+            }
+            if (!user.isConfirmed) {
+                throw new common_1.UnauthorizedException('Пожалуйста, подтвердите email или телефон');
+            }
+            return this.generateTokens(user.id, user.email, 'user');
         }
-        const isPasswordValid = await bcrypt.compare(dto.password, user.password);
-        if (!isPasswordValid) {
-            throw new common_1.UnauthorizedException('Неверные учетные данные');
+        const company = await this.cleaningCompanyService.findByEmail(dto.email);
+        if (company && company.password) {
+            const isCompanyPasswordValid = await bcrypt.compare(dto.password, company.password);
+            if (!isCompanyPasswordValid) {
+                throw new common_1.UnauthorizedException('Неверные учетные данные');
+            }
+            return this.generateTokens(company.id, company.email, 'company');
         }
-        if (!user.isConfirmed) {
-            throw new common_1.UnauthorizedException('Пожалуйста, подтвердите email или телефон');
-        }
-        return this.generateTokens(user.id, user.email);
+        throw new common_1.UnauthorizedException('Неверные учетные данные');
     }
     async confirmEmail(token) {
         const user = await this.authRepository.findOne({ where: { confirmationToken: token } });
@@ -114,12 +128,13 @@ let AuthService = class AuthService {
             });
             await this.authRepository.save(user);
         }
-        return this.generateTokens(user.id, user.email);
+        return this.generateTokens(user.id, user.email, 'user');
     }
-    generateTokens(userId, email) {
-        const payload = { sub: userId, email };
+    generateTokens(userId, email, role) {
+        const payload = { sub: userId, email, role };
         return {
             access_token: this.jwtService.sign(payload),
+            user_role: role,
         };
     }
     sendConfirmationEmail(email, token) {
@@ -131,6 +146,7 @@ exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(auth_entity_1.Auth)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        cleaning_company_service_1.CleaningCompanyService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

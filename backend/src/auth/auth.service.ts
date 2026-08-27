@@ -1,7 +1,7 @@
 import {
   Injectable,
   UnauthorizedException,
-  BadRequestException
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -10,7 +10,8 @@ import * as bcrypt from 'bcrypt';
 import { v4 as uuid4 } from 'uuid';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
-import { Auth} from "./entities/auth.entity";
+import { Auth } from './entities/auth.entity';
+import { CleaningCompanyService } from '../cleaning-company/cleaning-company.service';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
     @InjectRepository(Auth)
     private authRepository: Repository<Auth>,
     private jwtService: JwtService,
+    private cleaningCompanyService: CleaningCompanyService,
   ) {}
 
   async register(dto: RegisterAuthDto) {
@@ -44,21 +46,38 @@ export class AuthService {
   }
 
   async login(dto: LoginAuthDto) {
+
     const user = await this.authRepository.findOne({ where: { email: dto.email } });
-    if (!user || !user.password) {
-      throw new UnauthorizedException('Неверные учетные данные');
+
+    if (user) {
+      if (!user.password) {
+        throw new UnauthorizedException('Неверные учетные данные');
+      }
+
+      const isPasswordValid = await bcrypt.compare(dto.password, user.password);
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Неверные учетные данные');
+      }
+
+      if (!user.isConfirmed) {
+        throw new UnauthorizedException('Пожалуйста, подтвердите email или телефон');
+      }
+
+      return this.generateTokens(user.id, user.email, 'user');
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Неверные учетные данные');
+    const company = await this.cleaningCompanyService.findByEmail(dto.email);
+
+    if (company && company.password) {
+      const isCompanyPasswordValid = await bcrypt.compare(dto.password, company.password);
+      if (!isCompanyPasswordValid) {
+        throw new UnauthorizedException('Неверные учетные данные');
+      }
+
+      return this.generateTokens(company.id, company.email, 'company');
     }
 
-    if (!user.isConfirmed) {
-      throw new UnauthorizedException('Пожалуйста, подтвердите email или телефон');
-    }
-
-    return this.generateTokens(user.id, user.email);
+    throw new UnauthorizedException('Неверные учетные данные');
   }
 
   async confirmEmail(token: string) {
@@ -89,18 +108,18 @@ export class AuthService {
       await this.authRepository.save(user);
     }
 
-    return this.generateTokens(user.id, user.email);
+    return this.generateTokens(user.id, user.email, 'user');
   }
 
-  private generateTokens(userId: number, email: string) {
-    const payload = { sub: userId, email };
+  private generateTokens(userId: number, email: string, role: 'user' | 'company') {
+    const payload = { sub: userId, email, role };
     return {
       access_token: this.jwtService.sign(payload),
+      user_role: role,
     };
   }
 
   private sendConfirmationEmail(email: string, token: string) {
-
     console.log(`[EMAIL SEND MOCK] Ссылка для ${email}: http://localhost:3000/auth/confirm?token=${token}`);
   }
 }

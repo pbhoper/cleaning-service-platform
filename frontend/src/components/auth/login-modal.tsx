@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
-import { Modal, Form, Input, Button, message, Divider, Typography } from 'antd';
+import {
+  Modal,
+  Form,
+  Input,
+  Button,
+  message,
+  Divider,
+  Typography
+} from 'antd';
 import {
   MailOutlined,
   LockOutlined,
   UserOutlined,
-  ArrowRightOutlined,
   ShopOutlined,
 } from '@ant-design/icons';
 import axios from 'axios';
@@ -18,7 +25,7 @@ interface LoginModalProps {
   onGuestBooking?: () => void;
 }
 
-export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose, onGuestBooking }) => {
+export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
@@ -45,22 +52,28 @@ export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose, onGuestBo
 
     try {
       const response = await axios.post(endpoint, payload);
-      const { access_token } = response.data;
+      const { access_token, role, user_role, user } = response.data;
+      const detectedRole = role || user_role || user?.role || 'user';
 
       if (access_token) {
         localStorage.setItem('access_token', access_token);
+        localStorage.setItem('user_role', detectedRole);
       }
 
-      message.success(isRegister ? 'Регистрация прошла успешно!' : 'Авторизация успешна!');
+      message.success(isRegister ? 'Регистрация прошла успешно!' : 'Успешный вход!');
       form.resetFields();
       onClose();
 
-      window.location.reload();
+      if (detectedRole === 'company') {
+        window.location.href = '/cleaning-company';
+      } else {
+        window.location.href = '/profile';
+      }
     } catch (error: any) {
       const serverMessage = error.response?.data?.message;
       const errorText = Array.isArray(serverMessage)
         ? serverMessage.join(', ')
-        : serverMessage || 'Ошибка при отправке данных. Проверьте введенные поля.';
+        : serverMessage || 'Ошибка при входе. Проверьте логин и пароль.';
 
       message.error(errorText);
     } finally {
@@ -87,90 +100,49 @@ export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose, onGuestBo
         <Text type="secondary">
           {isRegister
             ? 'Заполните данные для создания аккаунта'
-            : 'Для сотрудников клининга и клиентов'}
+            : 'Единая форма входа для клиентов и компаний'}
         </Text>
       </div>
 
       <Form form={form} layout="vertical" onFinish={handleFinish} size="large">
         {isRegister && (
-          <>
-            <Form.Item
-              name="firstName"
-              label="Имя"
-              rules={[{ required: true, message: 'Введите ваше имя' }]}
-            >
-              <Input prefix={<UserOutlined />} placeholder="Иван" />
-            </Form.Item>
-
-            <Form.Item name="lastName" label="Фамилия (необязательно)">
-              <Input prefix={<UserOutlined />} placeholder="Иванов" />
-            </Form.Item>
-          </>
+          <Form.Item name="firstName" rules={[{ required: true, message: 'Введите имя' }]}>
+            <Input prefix={<UserOutlined />} placeholder="Имя" />
+          </Form.Item>
         )}
 
         <Form.Item
           name="email"
-          label="Email"
-          rules={[
-            { required: true, message: 'Введите email' },
-            { type: 'email', message: 'Введите корректный email' },
-          ]}
+          rules={[{ required: true, type: 'email', message: 'Введите e-mail' }]}
         >
-          <Input prefix={<MailOutlined />} placeholder="name@example.com" />
+          <Input prefix={<MailOutlined />} placeholder="E-mail" />
         </Form.Item>
 
         <Form.Item
           name="password"
-          label="Пароль"
-          rules={[
-            { required: true, message: 'Введите пароль' },
-            { min: 6, message: 'Пароль должен быть не менее 6 символов' },
-          ]}
+          rules={[{ required: true, message: 'Введите пароль' }]}
         >
           <Input.Password prefix={<LockOutlined />} placeholder="Пароль" />
         </Form.Item>
 
-        <Form.Item style={{ marginBottom: 12, marginTop: 24 }}>
-          <Button type="primary" htmlType="submit" block loading={loading}>
-            {isRegister ? 'Зарегистрироваться' : 'Войти'}
-          </Button>
-        </Form.Item>
+        <Button type="primary" htmlType="submit" block loading={loading} style={{ marginTop: 8 }}>
+          {isRegister ? 'Зарегистрироваться' : 'Войти'}
+        </Button>
       </Form>
 
-      <div style={{ textAlign: 'center', marginBottom: 12 }}>
-        <Button type="link" onClick={toggleMode} style={{ padding: 0 }}>
-          {isRegister ? 'Уже есть аккаунт? Войти' : 'Ещё нет аккаунта? Зарегистрироваться'}
+      <Divider style={{ margin: '16px 0' }} />
+
+      <div style={{ textAlign: 'center' }}>
+        <Button type="link" onClick={toggleMode}>
+          {isRegister ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться'}
         </Button>
       </div>
 
-      {isRegister ? (
-        <>
-          <Divider style={{ margin: '12px 0' }}>Для сотрудничества с нами</Divider>
-          <Button
-            type="default"
-            block
-            icon={<ShopOutlined />}
-            onClick={handleCompanyRegister}
-          >
-            Регистрация компании
-          </Button>
-        </>
-      ) : (
-        <>
-          <Divider style={{ margin: '16px 0' }}>Или</Divider>
-          <Button
-            type="dashed"
-            block
-            icon={<ArrowRightOutlined />}
-            onClick={() => {
-              onClose();
-              if (onGuestBooking) onGuestBooking();
-            }}
-          >
-            Забронировать без входа
-          </Button>
-        </>
-      )}
+      <div style={{ textAlign: 'center', marginTop: 8 }}>
+        <Button type="dashed" icon={<ShopOutlined />} block onClick={handleCompanyRegister}>
+          Регистрация новой клининговой компании
+        </Button>
+      </div>
     </Modal>
   );
 };

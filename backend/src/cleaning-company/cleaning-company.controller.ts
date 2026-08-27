@@ -1,46 +1,18 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  ParseIntPipe,
-  HttpCode,
-  HttpStatus
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { CleaningCompanyService } from './cleaning-company.service';
-import { CreateCleaningCompanyDto } from './dto/create-cleaning-company.dto';
-import { UpdateCleaningCompanyDto } from './dto/update-cleaning-company.dto';
+import {CreateCleaningCompanyDto} from "./dto/create-cleaning-company.dto";
 
 @Controller('cleaning-company')
 export class CleaningCompanyController {
-  constructor(private readonly cleaningCompanyService: CleaningCompanyService) {}
+  constructor(private readonly companyService: CleaningCompanyService) {}
 
   @Post()
-  create(@Body() createCleaningCompanyDto: CreateCleaningCompanyDto) {
-    return this.cleaningCompanyService.create(createCleaningCompanyDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.cleaningCompanyService.findAll();
+  async register(@Body() dto: CreateCleaningCompanyDto) {
+    return this.companyService.create(dto);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.cleaningCompanyService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateCleaningCompanyDto: UpdateCleaningCompanyDto) {
-    return this.cleaningCompanyService.update(id, updateCleaningCompanyDto);
-  }
-
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.cleaningCompanyService.remove(id);
+  async getProfile(@Param('id', ParseIntPipe) id: number) {
+    return this.companyService.findById(id);
   }
 }

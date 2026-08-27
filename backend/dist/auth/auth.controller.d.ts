@@ -9,6 +9,7 @@ export declare class AuthController {
     }>;
     login(loginDto: LoginAuthDto): Promise<{
         access_token: string;
+        user_role: "company" | "user";
     }>;
     confirm(token: string): Promise<{
         message: string;
@@ -16,5 +17,6 @@ export declare class AuthController {
     googleAuth(req: any): Promise<void>;
     googleAuthRedirect(req: any): Promise<{
         access_token: string;
+        user_role: "company" | "user";
     }>;
 }
