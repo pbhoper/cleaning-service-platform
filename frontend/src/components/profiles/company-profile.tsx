@@ -19,6 +19,9 @@ import {
   Divider,
   message,
   Descriptions,
+  Calendar,
+  Badge,
+  Select,
 } from 'antd';
 import {
   CheckCircleOutlined,
@@ -27,8 +30,12 @@ import {
   StarOutlined,
   LockOutlined,
   SaveOutlined,
+  CalendarOutlined,
+  UnorderedListOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
-import {cleaningTypes} from "../booking/booking-modal.tsx";
+import { type Dayjs } from 'dayjs';
+import { cleaningTypes } from '../booking/booking-modal.tsx';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -62,6 +69,21 @@ export interface Review {
 interface CompanyDashboardProps {
   initialCompanyData?: any;
 }
+
+const MONTH_NAMES = [
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь',
+];
 
 const INITIAL_ORDERS: Order[] = [
   {
@@ -97,6 +119,22 @@ const INITIAL_ORDERS: Order[] = [
     estimatedTimeMinutes: 135,
     status: 'confirmed',
   },
+  {
+    id: 103,
+    clientName: 'Дмитрий Сидоров',
+    contact: '+7 (903) 444-55-66',
+    address: 'г. Москва, ул. Тверская, д. 8',
+    cleaningType: 'Уборка после ремонта',
+    smallRooms: 3,
+    largeRooms: 2,
+    bathrooms: 2,
+    date: '2026-09-15',
+    startTime: '09:00',
+    recurrence: 'ONCE',
+    price: 12500,
+    estimatedTimeMinutes: 360,
+    status: 'new',
+  },
 ];
 
 const INITIAL_REVIEWS: Review[] = [
@@ -115,7 +153,6 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [cancelForm] = Form.useForm();
-
   const [profileForm] = Form.useForm();
   const [reviews] = useState<Review[]>(INITIAL_REVIEWS);
   const [visibleReviewsCount, setVisibleReviewsCount] = useState(5);
@@ -204,19 +241,75 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
     return h > 0 ? `${h} ч. ${m} мин.` : `${m} мин.`;
   };
 
+  const dateCellRender = (value: Dayjs) => {
+    const dateStr = value.format('YYYY-MM-DD');
+    const dayOrders = orders.filter((o) => o.date === dateStr);
+
+    return (
+      <div style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+        {dayOrders.map((order) => {
+          let badgeStatus: 'warning' | 'success' | 'error' = 'warning';
+          if (order.status === 'confirmed') badgeStatus = 'success';
+          if (order.status === 'cancelled') badgeStatus = 'error';
+
+          return (
+            <div
+              key={order.id}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedOrder(order);
+                setDetailsModalOpen(true);
+              }}
+              style={{
+                cursor: 'pointer',
+                marginBottom: 4,
+                fontSize: 11,
+                padding: '2px 4px',
+                borderRadius: 4,
+                backgroundColor:
+                  order.status === 'confirmed'
+                    ? '#f6ffed'
+                    : order.status === 'cancelled'
+                      ? '#fff2f0'
+                      : '#fffbe6',
+                border: `1px solid ${
+                  order.status === 'confirmed'
+                    ? '#b7eb8f'
+                    : order.status === 'cancelled'
+                      ? '#ffccc7'
+                      : '#ffe58f'
+                }`,
+              }}
+            >
+              <Badge status={badgeStatus} text={<b>{order.startTime} №{order.id}</b>} />
+              <div
+                style={{
+                  color: '#444',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {order.cleaningType}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   const columns = [
     { title: '№ Заказа', dataIndex: 'id', key: 'id', width: 90 },
     { title: 'Дата и время', key: 'dateTime', render: (record: Order) => `${record.date} в ${record.startTime}` },
     { title: 'Тип уборки', dataIndex: 'cleaningType', key: 'cleaningType' },
     { title: 'Адрес', dataIndex: 'address', key: 'address' },
     { title: 'Сумма', key: 'price', render: (record: Order) => `${record.price.toLocaleString('ru-RU')} ₽` },
-    {
-      title: 'Статус',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: Order['status']) => {
+    {title: 'Статус', dataIndex: 'status', key: 'status', render: (status: Order['status']) => {
+
         if (status === 'confirmed') return <Tag color="green">Подтвержден</Tag>;
         if (status === 'cancelled') return <Tag color="red">Отменен</Tag>;
+
         return <Tag color="orange">Новый</Tag>;
       },
     },
@@ -268,7 +361,11 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
         items={[
           {
             key: 'orders',
-            label: 'Управление заказами',
+            label: (
+              <span>
+                <UnorderedListOutlined /> Управление заказами
+              </span>
+            ),
             children: (
               <Card title="Список заказов клининга">
                 <Table
@@ -281,8 +378,59 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
             ),
           },
           {
+            key: 'calendar',
+            label: (
+              <span>
+                <CalendarOutlined /> Календарь службы
+              </span>
+            ),
+            children: (
+              <Card title="Календарь расписания заказов">
+                <Calendar
+                  cellRender={(date) => dateCellRender(date)}
+                  headerRender={({ value, onChange }) => {
+                    const currentMonth = value.month();
+
+                    return (
+                      <div
+                        style={{
+                          padding: '8px 16px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 12,
+                        }}
+                      >
+                        <Text strong style={{ fontSize: 16 }}>
+                          Месяц:
+                        </Text>
+                        <Select
+                          value={currentMonth}
+                          onChange={(newMonth) => {
+                            const now = value.clone().month(newMonth);
+                            onChange(now);
+                          }}
+                          style={{ width: 140 }}
+                        >
+                          {MONTH_NAMES.map((month, index) => (
+                            <Select.Option key={index} value={index}>
+                              {month}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </div>
+                    );
+                  }}
+                />
+              </Card>
+            ),
+          },
+          {
             key: 'profile',
-            label: 'Профиль и Отзывы',
+            label: (
+              <span>
+                <UserOutlined /> Профиль и Отзывы
+              </span>
+            ),
             children: (
               <Row gutter={24}>
                 <Col xs={24} lg={14}>
