@@ -135,6 +135,7 @@ let AuthService = class AuthService {
         return {
             access_token: this.jwtService.sign(payload),
             user_role: role,
+            user_id: userId,
         };
     }
     sendConfirmationEmail(email, token) {

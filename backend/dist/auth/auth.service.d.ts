@@ -14,14 +14,16 @@ export declare class AuthService {
     }>;
     login(dto: LoginAuthDto): Promise<{
         access_token: string;
-        user_role: "company" | "user";
+        user_role: "user" | "company";
+        user_id: number;
     }>;
     confirmEmail(token: string): Promise<{
         message: string;
     }>;
     socialLogin(profile: any): Promise<{
         access_token: string;
-        user_role: "company" | "user";
+        user_role: "user" | "company";
+        user_id: number;
     }>;
     private generateTokens;
     private sendConfirmationEmail;

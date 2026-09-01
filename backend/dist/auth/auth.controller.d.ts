@@ -9,7 +9,8 @@ export declare class AuthController {
     }>;
     login(loginDto: LoginAuthDto): Promise<{
         access_token: string;
-        user_role: "company" | "user";
+        user_role: "user" | "company";
+        user_id: number;
     }>;
     confirm(token: string): Promise<{
         message: string;
@@ -17,6 +18,7 @@ export declare class AuthController {
     googleAuth(req: any): Promise<void>;
     googleAuthRedirect(req: any): Promise<{
         access_token: string;
-        user_role: "company" | "user";
+        user_role: "user" | "company";
+        user_id: number;
     }>;
 }

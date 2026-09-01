@@ -20,6 +20,7 @@ export class AuthService {
     private authRepository: Repository<Auth>,
     private jwtService: JwtService,
     private cleaningCompanyService: CleaningCompanyService,
+
   ) {}
 
   async register(dto: RegisterAuthDto) {
@@ -116,6 +117,7 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
       user_role: role,
+      user_id: userId,
     };
   }
 
