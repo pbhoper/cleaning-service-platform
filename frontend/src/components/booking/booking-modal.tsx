@@ -45,12 +45,11 @@ interface BookingModalProps {
 }
 
 export const BookingModal: React.FC<BookingModalProps> = ({
-   open,
-   onClose,
-   selectedCompany = null,
-   onOpenLogin,
-   }) => {
-
+                                                            open,
+                                                            onClose,
+                                                            selectedCompany = null,
+                                                            onOpenLogin,
+                                                          }) => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -58,6 +57,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [companiesModalOpen, setCompaniesModalOpen] = useState<boolean>(false);
   const [bookingData, setBookingData] = useState<any>(null);
   const isLoggedIn = !!localStorage.getItem('access_token');
+
   const smallRooms = Form.useWatch('smallRooms', form) || 0;
   const largeRooms = Form.useWatch('largeRooms', form) || 0;
   const bathrooms = Form.useWatch('bathrooms', form) || 0;
@@ -83,6 +83,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   }, [open, isLoggedIn, form]);
 
   const handleSubmit = async (values: any) => {
+    const rawUserId = localStorage.getItem('user_id');
+    const userId = rawUserId ? Number(rawUserId) : undefined;
+
     const formattedValues = {
       ...values,
       date: values.date?.format('YYYY-MM-DD'),
@@ -95,7 +98,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       setLoading(true);
       try {
         const payload = {
-          clientName: values.contact || 'Гость',
+          companyId: selectedCompany.id,
+          userId: userId,
+          clientName: values.contact || 'Заказчик',
           serviceType: values.cleaningType,
           address: values.address,
           smallRooms: Number(values.smallRooms || 0),
@@ -112,9 +117,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         if (!response.ok) throw new Error('Ошибка создания заказа');
 
         const newOrder = await response.json();
-        message.success(`Заказ №${newOrder.id} успешно оформлен для "${selectedCompany.name}"!`);
+        message.success(`Заказ №${newOrder.id} успешно оформлен!`);
         form.resetFields();
         onClose();
+
+        // Автоматически передвигаем пользователя к истории
+        navigate({ to: '/history' });
       } catch (err) {
         message.error('Ошибка при отправке заявки');
       } finally {
@@ -140,7 +148,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         footer={null}
         width={680}
         centered
-        destroyOnClose
+        destroyOnHidden
         title={<Title level={3} style={{ margin: 0 }}>Заказ уборки</Title>}
       >
         {!isLoggedIn && (
