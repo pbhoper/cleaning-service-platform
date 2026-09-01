@@ -13,9 +13,12 @@ export declare class CleaningCompanyController {
             email: string;
             phone: string;
             address: string;
+            latitude: number;
+            longitude: number;
             description: string;
             logo: string;
             serviceTypes: string[];
+            pricePerSqM: number;
             basePrices: {
                 smallRoom: number;
                 largeRoom: number;

@@ -1,13 +1,21 @@
 export declare class HistoryCleanService {
     private readonly cleaningHistory;
-    getHistoryByUserId(userId: string): Promise<{
+    getHistoryByUserId(userId: number): Promise<{
         success: boolean;
         data: {
             id: number;
-            date: string;
+            userId: number;
+            companyId: number;
+            companyName: string;
             serviceType: string;
-            status: string;
+            address: string;
+            smallRooms: number;
+            largeRooms: number;
+            bathrooms: number;
             price: number;
+            estimatedTimeMinutes: number;
+            status: string;
+            createdAt: string;
         }[];
     }>;
 }

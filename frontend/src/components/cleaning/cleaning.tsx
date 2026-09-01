@@ -46,6 +46,7 @@ export const CompanySelectionModal: React.FC<CompanySelectionModalProps> = ({
   onSuccess,
   onOpenLogin,
   }) => {
+
   const [companies, setCompanies] = useState<Company[]>([]);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -54,11 +55,10 @@ export const CompanySelectionModal: React.FC<CompanySelectionModalProps> = ({
   const [activeCompany, setActiveCompany] = useState<Company | null>(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState<boolean>(false);
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
-
   const isLoggedIn = !!localStorage.getItem('access_token');
-
   const observer = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useCallback(
+
     (node: HTMLDivElement | null) => {
       if (loading) return;
       if (observer.current) observer.current.disconnect();
@@ -101,7 +101,7 @@ export const CompanySelectionModal: React.FC<CompanySelectionModalProps> = ({
 
       setCompanies((prev) => (isNewSearch ? data.items : [...prev, ...data.items]));
       setHasMore(data.meta?.hasMore ?? false);
-    } catch (err) {
+    } catch {
       message.error('Не удалось загрузить список служб');
     } finally {
       setLoading(false);
@@ -147,19 +147,40 @@ export const CompanySelectionModal: React.FC<CompanySelectionModalProps> = ({
   };
 
   const handleConfirmOrder = async () => {
+    if (!activeCompany) return;
     setConfirmLoading(true);
     try {
-      console.log('Итоговое бронирование:', {
-        ...bookingData,
-        companyId: activeCompany?.id,
-        price: activeCompany?.estimatedPrice,
+      const storedUserId = localStorage.getItem('user_id');
+      const userId = storedUserId ? Number(storedUserId) : undefined;
+
+      const payload = {
+        companyId: activeCompany.id,
+        userId: userId,
+        clientName: bookingData?.contact || 'Гость',
+        serviceType: bookingData?.cleaningType || 'Стандартная уборка',
+        address: bookingData?.address || '',
+        smallRooms: Number(bookingData?.smallRooms || 0),
+        largeRooms: Number(bookingData?.largeRooms || 0),
+        bathrooms: Number(bookingData?.bathrooms || 0),
+      };
+
+      const response = await fetch('http://localhost:3000/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
-      message.success(`Заказ в "${activeCompany?.name}" успешно подтвержден!`);
+      if (!response.ok) {
+        throw new Error('Не удалось создать заказ');
+      }
+
+      const createdOrder = await response.json();
+
+      message.success(`Заказ №${createdOrder.id} в "${activeCompany?.name}" успешно создан!`);
       setConfirmModalOpen(false);
       onSuccess();
-    } catch (err) {
-      message.error('Ошибка при оформлении заказа');
+    } catch (err: any) {
+      message.error(err.message || 'Ошибка при оформлении заказа');
     } finally {
       setConfirmLoading(false);
     }

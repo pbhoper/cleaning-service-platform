@@ -52,12 +52,20 @@ export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
 
     try {
       const response = await axios.post(endpoint, payload);
-      const { access_token, role, user_role, user } = response.data;
+      const { access_token, role, user_role, user, id, user_id } = response.data;
       const detectedRole = role || user_role || user?.role || 'user';
+
+      // Извлекаем ID пользователя из любого возможного поля ответа
+      const detectedUserId = user?.id || user_id || id;
 
       if (access_token) {
         localStorage.setItem('access_token', access_token);
         localStorage.setItem('user_role', detectedRole);
+
+        // Сохраняем ID пользователя для использования на странице /history
+        if (detectedUserId) {
+          localStorage.setItem('user_id', String(detectedUserId));
+        }
       }
 
       message.success(isRegister ? 'Регистрация прошла успешно!' : 'Успешный вход!');
@@ -67,7 +75,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
       if (detectedRole === 'company') {
         window.location.href = '/cleaning-company';
       } else {
-        window.location.href = '/profile';
+        window.location.href = '/history';
       }
     } catch (error: any) {
       const serverMessage = error.response?.data?.message;
@@ -92,7 +100,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
   };
 
   return (
-    <Modal open={open} onCancel={onClose} footer={null} centered width={380} destroyOnClose>
+    <Modal
+      open={open}
+      onCancel={onClose}
+      footer={null}
+      centered
+      width={380}
+      destroyOnHidden
+    >
       <div style={{ textAlign: 'center', marginBottom: 20 }}>
         <Title level={4} style={{ marginBottom: 4 }}>
           {isRegister ? 'Регистрация' : 'Вход в систему'}

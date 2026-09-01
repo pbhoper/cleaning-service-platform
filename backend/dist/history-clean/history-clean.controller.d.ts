@@ -2,14 +2,22 @@ import { HistoryCleanService } from './history-clean.service';
 export declare class HistoryCleanController {
     private readonly historyCleanService;
     constructor(historyCleanService: HistoryCleanService);
-    getHistory(userId: string): Promise<{
+    getHistoryByUserId(userId: number): Promise<{
         success: boolean;
         data: {
             id: number;
-            date: string;
+            userId: number;
+            companyId: number;
+            companyName: string;
             serviceType: string;
-            status: string;
+            address: string;
+            smallRooms: number;
+            largeRooms: number;
+            bathrooms: number;
             price: number;
+            estimatedTimeMinutes: number;
+            status: string;
+            createdAt: string;
         }[];
     }>;
 }

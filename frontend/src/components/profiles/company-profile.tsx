@@ -22,6 +22,7 @@ import {
   Calendar,
   Badge,
   Select,
+  Spin,
 } from 'antd';
 import {
   CheckCircleOutlined,
@@ -35,27 +36,23 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { type Dayjs } from 'dayjs';
-import { cleaningTypes } from '../booking/booking-modal.tsx';
 
 const { Title, Text, Paragraph } = Typography;
 
 export interface Order {
   id: number;
-  clientName?: string;
-  contact: string;
+  companyId: number;
+  userId?: number;
+  clientName: string;
+  serviceType: string;
   address: string;
-  cleaningType: string;
   smallRooms: number;
   largeRooms: number;
   bathrooms: number;
-  date: string;
-  startTime: string;
-  recurrence: 'ONCE' | 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY';
-  recurrenceDurationMonths?: number;
   price: number;
   estimatedTimeMinutes: number;
-  status: 'new' | 'confirmed' | 'cancelled';
-  cancellationReason?: string;
+  status: 'open' | 'confirmed' | 'cancelled';
+  createdAt?: string;
 }
 
 export interface Review {
@@ -85,77 +82,45 @@ const MONTH_NAMES = [
   'Декабрь',
 ];
 
-const INITIAL_ORDERS: Order[] = [
-  {
-    id: 101,
-    clientName: 'Алексей Иванов',
-    contact: '+7 (999) 111-22-33',
-    address: 'г. Москва, ул. Арбат, д. 12, кв. 34',
-    cleaningType: 'Генеральная уборка',
-    smallRooms: 2,
-    largeRooms: 1,
-    bathrooms: 2,
-    date: '2026-09-01',
-    startTime: '10:00',
-    recurrence: 'ONCE',
-    price: 7800,
-    estimatedTimeMinutes: 225,
-    status: 'new',
-  },
-  {
-    id: 102,
-    clientName: 'Елена Петрова',
-    contact: 'elena@example.com',
-    address: 'г. Москва, Ленинский пр-т, д. 45, кв. 89',
-    cleaningType: 'Стандартная уборка помещений',
-    smallRooms: 1,
-    largeRooms: 1,
-    bathrooms: 1,
-    date: '2026-09-02',
-    startTime: '14:00',
-    recurrence: 'WEEKLY',
-    recurrenceDurationMonths: 3,
-    price: 3500,
-    estimatedTimeMinutes: 135,
-    status: 'confirmed',
-  },
-  {
-    id: 103,
-    clientName: 'Дмитрий Сидоров',
-    contact: '+7 (903) 444-55-66',
-    address: 'г. Москва, ул. Тверская, д. 8',
-    cleaningType: 'Уборка после ремонта',
-    smallRooms: 3,
-    largeRooms: 2,
-    bathrooms: 2,
-    date: '2026-09-15',
-    startTime: '09:00',
-    recurrence: 'ONCE',
-    price: 12500,
-    estimatedTimeMinutes: 360,
-    status: 'new',
-  },
-];
-
 const INITIAL_REVIEWS: Review[] = [
   { id: 1, author: 'Ольга', rating: 5, date: '2026-08-20', comment: 'Отличная уборка, всё блестит!' },
   { id: 2, author: 'Дмитрий', rating: 4, date: '2026-08-18', comment: 'Пунктуальные клинеры, но немного затянули по времени.' },
   { id: 3, author: 'Мария', rating: 5, date: '2026-08-15', comment: 'Очень качественно отмыли сантехнику.' },
   { id: 4, author: 'Игорь', rating: 5, date: '2026-08-10', comment: 'Заказываем регулярно, нареканий нет.' },
   { id: 5, author: 'Светлана', rating: 4, date: '2026-08-05', comment: 'Хорошая клининговая служба.' },
-  { id: 6, author: 'Екатерина', rating: 5, date: '2026-07-28', comment: 'Супер! Уборка после ремонта прошла на ура.' },
-  { id: 7, author: 'Павел', rating: 5, date: '2026-07-20', comment: 'Рекомендую данную компанию.' },
 ];
 
 export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompanyData }) => {
-  const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
-  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState<boolean>(false);
+  const [cancelModalOpen, setCancelModalOpen] = useState<boolean>(false);
   const [cancelForm] = Form.useForm();
   const [profileForm] = Form.useForm();
   const [reviews] = useState<Review[]>(INITIAL_REVIEWS);
-  const [visibleReviewsCount, setVisibleReviewsCount] = useState(5);
+  const [visibleReviewsCount, setVisibleReviewsCount] = useState<number>(5);
+
+  const companyId = initialCompanyData?.id || Number(localStorage.getItem('company_id')) || 1;
+
+  const fetchCompanyOrders = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:3000/order/company/${companyId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setOrders(data);
+      }
+    } catch {
+      message.error('Не удалось загрузить заказы из базы данных');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanyOrders();
+  }, [companyId]);
 
   useEffect(() => {
     if (initialCompanyData) {
@@ -172,44 +137,44 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
     }
   }, [initialCompanyData, profileForm]);
 
-  const handleConfirmOrder = (orderId: number) => {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: 'confirmed' } : o))
-    );
-    if (selectedOrder?.id === orderId) {
-      setSelectedOrder((prev) => (prev ? { ...prev, status: 'confirmed' } : null));
+  const handleConfirmOrder = async (orderId: number) => {
+    try {
+      const res = await fetch(`http://localhost:3000/order/${orderId}/confirm`, {
+        method: 'PATCH',
+      });
+      if (res.ok) {
+        setOrders((prev) =>
+          prev.map((o) => (o.id === orderId ? { ...o, status: 'confirmed' } : o)),
+        );
+        if (selectedOrder?.id === orderId) {
+          setSelectedOrder((prev) => (prev ? { ...prev, status: 'confirmed' } : null));
+        }
+        message.success('Заказ подтвержден!');
+      }
+    } catch {
+      message.error('Ошибка при подтверждении заказа');
     }
-    message.success('Заказ подтвержден! Клиенту отправлено письмо.');
-  };
-
-  const handleOpenCancelModal = (order: Order) => {
-    setSelectedOrder(order);
-    setCancelModalOpen(true);
   };
 
   const handleConfirmCancel = async () => {
+    if (!selectedOrder) return;
     try {
-      const values = await cancelForm.validateFields();
-      if (!selectedOrder) return;
-
-      setOrders((prev) =>
-        prev.map((o) =>
-          o.id === selectedOrder.id
-            ? { ...o, status: 'cancelled', cancellationReason: values.reason }
-            : o
-        )
-      );
-
-      if (selectedOrder) {
-        setSelectedOrder((prev) =>
-          prev ? { ...prev, status: 'cancelled', cancellationReason: values.reason } : null
+      const res = await fetch(`http://localhost:3000/order/${selectedOrder.id}/cancel`, {
+        method: 'PATCH',
+      });
+      if (res.ok) {
+        setOrders((prev) =>
+          prev.map((o) => (o.id === selectedOrder.id ? { ...o, status: 'cancelled' } : o)),
         );
+        if (selectedOrder) {
+          setSelectedOrder((prev) => (prev ? { ...prev, status: 'cancelled' } : null));
+        }
+        message.warning('Заказ отменен.');
+        cancelForm.resetFields();
+        setCancelModalOpen(false);
       }
-
-      message.warning('Заказ отменен.');
-      cancelForm.resetFields();
-      setCancelModalOpen(false);
     } catch {
+      message.error('Ошибка при отмене заказа');
     }
   };
 
@@ -221,20 +186,6 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
     message.success('Данные профиля успешно обновлены!');
   };
 
-  const formatRecurrence = (order: Order) => {
-    const map = {
-      ONCE: 'Только один раз',
-      WEEKLY: 'Каждую неделю',
-      BIWEEKLY: 'Каждые две недели',
-      MONTHLY: 'Каждый месяц',
-    };
-    let text = map[order.recurrence];
-    if (order.recurrence !== 'ONCE' && order.recurrenceDurationMonths) {
-      text += ` (Срок сделки: ${order.recurrenceDurationMonths} мес.)`;
-    }
-    return text;
-  };
-
   const formatMinutes = (totalMinutes: number) => {
     const h = Math.floor(totalMinutes / 60);
     const m = totalMinutes % 60;
@@ -243,7 +194,7 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
 
   const dateCellRender = (value: Dayjs) => {
     const dateStr = value.format('YYYY-MM-DD');
-    const dayOrders = orders.filter((o) => o.date === dateStr);
+    const dayOrders = orders.filter((o) => o.createdAt && o.createdAt.startsWith(dateStr));
 
     return (
       <div style={{ listStyle: 'none', margin: 0, padding: 0 }}>
@@ -281,7 +232,7 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
                 }`,
               }}
             >
-              <Badge status={badgeStatus} text={<b>{order.startTime} №{order.id}</b>} />
+              <Badge status={badgeStatus} text={<b>№{order.id}</b>} />
               <div
                 style={{
                   color: '#444',
@@ -290,7 +241,7 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
                   textOverflow: 'ellipsis',
                 }}
               >
-                {order.cleaningType}
+                {order.serviceType}
               </div>
             </div>
           );
@@ -301,15 +252,21 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
 
   const columns = [
     { title: '№ Заказа', dataIndex: 'id', key: 'id', width: 90 },
-    { title: 'Дата и время', key: 'dateTime', render: (record: Order) => `${record.date} в ${record.startTime}` },
-    { title: 'Тип уборки', dataIndex: 'cleaningType', key: 'cleaningType' },
+    { title: 'Клиент', dataIndex: 'clientName', key: 'clientName' },
+    { title: 'Тип уборки', dataIndex: 'serviceType', key: 'serviceType' },
     { title: 'Адрес', dataIndex: 'address', key: 'address' },
-    { title: 'Сумма', key: 'price', render: (record: Order) => `${record.price.toLocaleString('ru-RU')} ₽` },
-    {title: 'Статус', dataIndex: 'status', key: 'status', render: (status: Order['status']) => {
-
+    {
+      title: 'Сумма',
+      key: 'price',
+      render: (record: Order) => `${(record.price || 0).toLocaleString('ru-RU')} ₽`,
+    },
+    {
+      title: 'Статус',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: string) => {
         if (status === 'confirmed') return <Tag color="green">Подтвержден</Tag>;
         if (status === 'cancelled') return <Tag color="red">Отменен</Tag>;
-
         return <Tag color="orange">Новый</Tag>;
       },
     },
@@ -328,7 +285,7 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
           >
             Детали
           </Button>
-          {record.status === 'new' && (
+          {record.status === 'open' && (
             <Button
               type="primary"
               icon={<CheckCircleOutlined />}
@@ -343,7 +300,10 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
               danger
               icon={<CloseCircleOutlined />}
               size="small"
-              onClick={() => handleOpenCancelModal(record)}
+              onClick={() => {
+                setSelectedOrder(record);
+                setCancelModalOpen(true);
+              }}
             >
               Отменить
             </Button>
@@ -368,12 +328,18 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
             ),
             children: (
               <Card title="Список заказов клининга">
-                <Table
-                  dataSource={orders}
-                  columns={columns}
-                  rowKey="id"
-                  pagination={{ pageSize: 5 }}
-                />
+                {loading ? (
+                  <div style={{ textAlign: 'center', padding: '24px 0' }}>
+                    <Spin tip="Загрузка заказов..." />
+                  </div>
+                ) : (
+                  <Table
+                    dataSource={orders}
+                    columns={columns}
+                    rowKey="id"
+                    pagination={{ pageSize: 8 }}
+                  />
+                )}
               </Card>
             ),
           },
@@ -443,8 +409,8 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
                         name: 'ООО Чистый Дом',
                         address: 'г. Москва, ул. Мира, д. 5',
                         description: 'Профессиональная уборка квартир и офисов любой сложности.',
-                        logo: 'https://via.placeholder.com/150',
-                        serviceTypes: ['Стандартная уборка помещений', 'Генеральная уборка'],
+                        logo: '',
+                        serviceTypes: ['Стандартная уборка', 'Генеральная уборка'],
                         priceSmallRoom: 800,
                         priceLargeRoom: 1200,
                         priceBathroom: 1500,
@@ -467,7 +433,13 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
                       </Form.Item>
 
                       <Form.Item name="serviceTypes" label="Типы оказываемых услуг">
-                        <Checkbox.Group options={cleaningTypes.map((t) => ({ label: t, value: t }))} />
+                        <Checkbox.Group
+                          options={[
+                            'Стандартная уборка',
+                            'Генеральная уборка',
+                            'Уборка после ремонта',
+                          ]}
+                        />
                       </Form.Item>
 
                       <Divider>Расценки на услуги</Divider>
@@ -565,7 +537,7 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
           open={detailsModalOpen}
           onCancel={() => setDetailsModalOpen(false)}
           footer={[
-            selectedOrder.status === 'new' && (
+            selectedOrder.status === 'open' && (
               <Button
                 key="confirm"
                 type="primary"
@@ -582,7 +554,7 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
                 icon={<CloseCircleOutlined />}
                 onClick={() => {
                   setDetailsModalOpen(false);
-                  handleOpenCancelModal(selectedOrder);
+                  setCancelModalOpen(true);
                 }}
               >
                 Отменить заказ
@@ -598,45 +570,28 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
             <Descriptions.Item label="Имя клиента">
               {selectedOrder.clientName || 'Не указано'}
             </Descriptions.Item>
-            <Descriptions.Item label="Email / Телефон">
-              {selectedOrder.contact}
-            </Descriptions.Item>
             <Descriptions.Item label="Адрес / местоположение">
               {selectedOrder.address}
             </Descriptions.Item>
             <Descriptions.Item label="Тип уборки">
-              {selectedOrder.cleaningType}
+              {selectedOrder.serviceType}
             </Descriptions.Item>
             <Descriptions.Item label="Описание помещения">
-              Маленьких комнат (&lt;20м²): {selectedOrder.smallRooms}, Больших комнат (&gt;20м²): {selectedOrder.largeRooms}, Санузлов: {selectedOrder.bathrooms}
-            </Descriptions.Item>
-            <Descriptions.Item label="День проведения">
-              {selectedOrder.date}
-            </Descriptions.Item>
-            <Descriptions.Item label="Ожидаемое время начала">
-              {selectedOrder.startTime}
-            </Descriptions.Item>
-            <Descriptions.Item label="Планируемая регулярность">
-              {formatRecurrence(selectedOrder)}
+              Маленьких комнат: {selectedOrder.smallRooms}, Больших комнат: {selectedOrder.largeRooms}, Санузлов: {selectedOrder.bathrooms}
             </Descriptions.Item>
             <Descriptions.Item label="Цена уборки">
               <Text strong style={{ color: '#52c41a', fontSize: 16 }}>
-                {selectedOrder.price.toLocaleString('ru-RU')} ₽
+                {(selectedOrder.price || 0).toLocaleString('ru-RU')} ₽
               </Text>
             </Descriptions.Item>
             <Descriptions.Item label="Ожидаемое время уборки">
-              {formatMinutes(selectedOrder.estimatedTimeMinutes)}
+              {formatMinutes(selectedOrder.estimatedTimeMinutes || 0)}
             </Descriptions.Item>
             <Descriptions.Item label="Статус">
               {selectedOrder.status === 'confirmed' && <Tag color="green">Подтвержден</Tag>}
               {selectedOrder.status === 'cancelled' && <Tag color="red">Отменен</Tag>}
-              {selectedOrder.status === 'new' && <Tag color="orange">Новый</Tag>}
+              {selectedOrder.status === 'open' && <Tag color="orange">Новый</Tag>}
             </Descriptions.Item>
-            {selectedOrder.cancellationReason && (
-              <Descriptions.Item label="Причина отмены">
-                <Text type="danger">{selectedOrder.cancellationReason}</Text>
-              </Descriptions.Item>
-            )}
           </Descriptions>
         </Modal>
       )}
@@ -659,7 +614,7 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
             label="Укажите причину отмены заказа"
             rules={[{ required: true, message: 'Пожалуйста, укажите причину отмены' }]}
           >
-            <Input.TextArea rows={3} placeholder="Например: Отсутствие свободных клинеров на выбранное время" />
+            <Input.TextArea rows={3} placeholder="Например: Отсутствие свободных клинеров" />
           </Form.Item>
         </Form>
       </Modal>

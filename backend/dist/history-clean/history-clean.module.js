@@ -8,13 +8,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HistoryCleanModule = void 0;
 const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
 const history_clean_service_1 = require("./history-clean.service");
 const history_clean_controller_1 = require("./history-clean.controller");
+const order_entity_1 = require("../order/entity/order.entity");
 let HistoryCleanModule = class HistoryCleanModule {
 };
 exports.HistoryCleanModule = HistoryCleanModule;
 exports.HistoryCleanModule = HistoryCleanModule = __decorate([
     (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([order_entity_1.Order])],
         controllers: [history_clean_controller_1.HistoryCleanController],
         providers: [history_clean_service_1.HistoryCleanService],
         exports: [history_clean_service_1.HistoryCleanService],

@@ -17,6 +17,9 @@ class CreateCleaningCompanyDto {
     password;
     phone;
     address;
+    latitude;
+    longitude;
+    pricePerSqM;
     description;
     logo;
     serviceTypes;
@@ -48,6 +51,21 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateCleaningCompanyDto.prototype, "address", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateCleaningCompanyDto.prototype, "latitude", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateCleaningCompanyDto.prototype, "longitude", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateCleaningCompanyDto.prototype, "pricePerSqM", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),

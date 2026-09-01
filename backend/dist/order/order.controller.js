@@ -15,13 +15,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrderController = void 0;
 const common_1 = require("@nestjs/common");
 const order_service_1 = require("./order.service");
+const order_dto_1 = require("./dto/order.dto");
 let OrderController = class OrderController {
     orderService;
     constructor(orderService) {
         this.orderService = orderService;
     }
-    async getOpenOrders() {
-        return await this.orderService.getOpenOrders();
+    async createOrder(dto) {
+        return await this.orderService.createOrder(dto);
+    }
+    async getCompanyOrders(companyId) {
+        return await this.orderService.getCompanyOrders(companyId);
+    }
+    async getUserOrders(userId) {
+        return await this.orderService.getUserOrders(userId);
     }
     async confirmOrder(id) {
         return await this.orderService.confirmOrder(id);
@@ -32,11 +39,26 @@ let OrderController = class OrderController {
 };
 exports.OrderController = OrderController;
 __decorate([
-    (0, common_1.Get)('open'),
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [order_dto_1.CreateOrderDto]),
     __metadata("design:returntype", Promise)
-], OrderController.prototype, "getOpenOrders", null);
+], OrderController.prototype, "createOrder", null);
+__decorate([
+    (0, common_1.Get)('company/:companyId'),
+    __param(0, (0, common_1.Param)('companyId', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], OrderController.prototype, "getCompanyOrders", null);
+__decorate([
+    (0, common_1.Get)('user/:userId'),
+    __param(0, (0, common_1.Param)('userId', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], OrderController.prototype, "getUserOrders", null);
 __decorate([
     (0, common_1.Patch)(':id/confirm'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),

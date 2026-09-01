@@ -1,28 +1,12 @@
-export interface OrderItem {
-    id: number;
-    clientName: string;
-    serviceType: string;
-    address: string;
-    smallRooms: number;
-    largeRooms: number;
-    bathrooms: number;
-    price: number;
-    estimatedTimeMinutes: number;
-    status: 'open' | 'confirmed' | 'cancelled' | 'completed';
-    createdAt: Date;
-}
-export interface CreateOrderDto {
-    clientName: string;
-    serviceType: string;
-    address: string;
-    smallRooms: number;
-    largeRooms: number;
-    bathrooms: number;
-}
+import { Repository } from 'typeorm';
+import { Order } from "./entity/order.entity";
+import { CreateOrderDto } from "./dto/order.dto";
 export declare class OrderService {
-    private readonly orders;
-    getOpenOrders(): Promise<OrderItem[]>;
-    createOrder(dto: CreateOrderDto): Promise<OrderItem>;
-    confirmOrder(orderId: number): Promise<OrderItem>;
-    cancelOrder(orderId: number): Promise<OrderItem>;
+    private readonly orderRepository;
+    constructor(orderRepository: Repository<Order>);
+    createOrder(dto: CreateOrderDto): Promise<Order>;
+    getCompanyOrders(companyId: number): Promise<Order[]>;
+    getUserOrders(userId: number): Promise<Order[]>;
+    confirmOrder(orderId: number): Promise<Order>;
+    cancelOrder(orderId: number): Promise<Order>;
 }

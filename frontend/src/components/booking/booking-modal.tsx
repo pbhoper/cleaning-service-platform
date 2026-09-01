@@ -21,7 +21,7 @@ import { LoginOutlined, ShopOutlined, ClockCircleOutlined, DollarOutlined } from
 import dayjs from 'dayjs';
 import { CompanySelectionModal } from "../cleaning/cleaning.tsx";
 import { useNavigate } from "@tanstack/react-router";
-import {calculateCleaning} from "../../utils/cleaning-calculator.ts";
+import { calculateCleaning } from "../../utils/cleaning-calculator.ts";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -45,19 +45,18 @@ interface BookingModalProps {
 }
 
 export const BookingModal: React.FC<BookingModalProps> = ({
-  open,
-  onClose,
-  selectedCompany = null,
-  onOpenLogin,
-  }) => {
-  const navigate = useNavigate();
+   open,
+   onClose,
+   selectedCompany = null,
+   onOpenLogin,
+   }) => {
 
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [recurrence, setRecurrence] = useState<string>('ONCE');
   const [companiesModalOpen, setCompaniesModalOpen] = useState<boolean>(false);
   const [bookingData, setBookingData] = useState<any>(null);
-
   const isLoggedIn = !!localStorage.getItem('access_token');
   const smallRooms = Form.useWatch('smallRooms', form) || 0;
   const largeRooms = Form.useWatch('largeRooms', form) || 0;
@@ -95,8 +94,25 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     if (selectedCompany) {
       setLoading(true);
       try {
-        console.log('Отправка заявки:', { ...formattedValues, companyId: selectedCompany.id });
-        message.success(`Заявка успешно оформлена для "${selectedCompany.name}"!`);
+        const payload = {
+          clientName: values.contact || 'Гость',
+          serviceType: values.cleaningType,
+          address: values.address,
+          smallRooms: Number(values.smallRooms || 0),
+          largeRooms: Number(values.largeRooms || 0),
+          bathrooms: Number(values.bathrooms || 0),
+        };
+
+        const response = await fetch('http://localhost:3000/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) throw new Error('Ошибка создания заказа');
+
+        const newOrder = await response.json();
+        message.success(`Заказ №${newOrder.id} успешно оформлен для "${selectedCompany.name}"!`);
         form.resetFields();
         onClose();
       } catch (err) {

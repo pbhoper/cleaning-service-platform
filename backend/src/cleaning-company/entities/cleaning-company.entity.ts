@@ -26,6 +26,12 @@ export class CleaningCompanyEntity {
   @Column({ nullable: true })
   address: string;
 
+  @Column('double precision', { nullable: true })
+  latitude: number;
+
+  @Column('double precision', { nullable: true })
+  longitude: number;
+
   @Column({ type: 'text', nullable: true })
   description: string;
 
@@ -34,6 +40,9 @@ export class CleaningCompanyEntity {
 
   @Column('simple-array', { nullable: true })
   serviceTypes: string[];
+
+  @Column('decimal', { precision: 10, scale: 2, default: 50 })
+  pricePerSqM: number;
 
   @Column('json', { nullable: true })
   basePrices: {

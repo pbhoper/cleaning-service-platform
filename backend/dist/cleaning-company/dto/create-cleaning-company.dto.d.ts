@@ -4,6 +4,9 @@ export declare class CreateCleaningCompanyDto {
     password: string;
     phone: string;
     address?: string;
+    latitude?: number;
+    longitude?: number;
+    pricePerSqM?: number;
     description?: string;
     logo?: string;
     serviceTypes: string[];

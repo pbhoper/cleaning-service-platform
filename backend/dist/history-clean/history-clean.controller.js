@@ -20,18 +20,18 @@ let HistoryCleanController = class HistoryCleanController {
     constructor(historyCleanService) {
         this.historyCleanService = historyCleanService;
     }
-    async getHistory(userId) {
+    async getHistoryByUserId(userId) {
         return await this.historyCleanService.getHistoryByUserId(userId);
     }
 };
 exports.HistoryCleanController = HistoryCleanController;
 __decorate([
     (0, common_1.Get)('user/:userId'),
-    __param(0, (0, common_1.Param)('userId')),
+    __param(0, (0, common_1.Param)('userId', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
-], HistoryCleanController.prototype, "getHistory", null);
+], HistoryCleanController.prototype, "getHistoryByUserId", null);
 exports.HistoryCleanController = HistoryCleanController = __decorate([
     (0, common_1.Controller)('history-clean'),
     __metadata("design:paramtypes", [history_clean_service_1.HistoryCleanService])

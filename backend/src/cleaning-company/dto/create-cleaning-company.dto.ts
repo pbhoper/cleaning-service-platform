@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsArray,
   IsObject,
+  IsNumber,
   MinLength,
 } from 'class-validator';
 
@@ -27,6 +28,18 @@ export class CreateCleaningCompanyDto {
   @IsString()
   @IsOptional()
   address?: string;
+
+  @IsNumber()
+  @IsOptional()
+  latitude?: number;
+
+  @IsNumber()
+  @IsOptional()
+  longitude?: number;
+
+  @IsNumber()
+  @IsOptional()
+  pricePerSqM?: number;
 
   @IsString()
   @IsOptional()

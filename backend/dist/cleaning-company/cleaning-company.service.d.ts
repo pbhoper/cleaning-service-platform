@@ -16,9 +16,12 @@ export declare class CleaningCompanyService {
             email: string;
             phone: string;
             address: string;
+            latitude: number;
+            longitude: number;
             description: string;
             logo: string;
             serviceTypes: string[];
+            pricePerSqM: number;
             basePrices: {
                 smallRoom: number;
                 largeRoom: number;

@@ -18,9 +18,12 @@ let CleaningCompanyEntity = class CleaningCompanyEntity {
     password;
     phone;
     address;
+    latitude;
+    longitude;
     description;
     logo;
     serviceTypes;
+    pricePerSqM;
     basePrices;
     coefficients;
     role;
@@ -54,6 +57,14 @@ __decorate([
     __metadata("design:type", String)
 ], CleaningCompanyEntity.prototype, "address", void 0);
 __decorate([
+    (0, typeorm_1.Column)('double precision', { nullable: true }),
+    __metadata("design:type", Number)
+], CleaningCompanyEntity.prototype, "latitude", void 0);
+__decorate([
+    (0, typeorm_1.Column)('double precision', { nullable: true }),
+    __metadata("design:type", Number)
+], CleaningCompanyEntity.prototype, "longitude", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: 'text', nullable: true }),
     __metadata("design:type", String)
 ], CleaningCompanyEntity.prototype, "description", void 0);
@@ -65,6 +76,10 @@ __decorate([
     (0, typeorm_1.Column)('simple-array', { nullable: true }),
     __metadata("design:type", Array)
 ], CleaningCompanyEntity.prototype, "serviceTypes", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 2, default: 50 }),
+    __metadata("design:type", Number)
+], CleaningCompanyEntity.prototype, "pricePerSqM", void 0);
 __decorate([
     (0, typeorm_1.Column)('json', { nullable: true }),
     __metadata("design:type", Object)

@@ -1,65 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {calculateCleaning, RoomCounts} from "../utils/cleaning-calculator";
-
-export interface OrderItem {
-  id: number;
-  clientName: string;
-  serviceType: string;
-  address: string;
-  smallRooms: number;
-  largeRooms: number;
-  bathrooms: number;
-  price: number;
-  estimatedTimeMinutes: number;
-  status: 'open' | 'confirmed' | 'cancelled' | 'completed';
-  createdAt: Date;
-}
-
-export interface CreateOrderDto {
-  clientName: string;
-  serviceType: string;
-  address: string;
-  smallRooms: number;
-  largeRooms: number;
-  bathrooms: number;
-}
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { calculateCleaning, RoomCounts } from '../utils/cleaning-calculator';
+import {Order} from "./entity/order.entity";
+import {CreateOrderDto} from "./dto/order.dto";
 
 @Injectable()
 export class OrderService {
-  private readonly orders: OrderItem[] = [
-    {
-      id: 1,
-      clientName: 'Анна',
-      serviceType: 'Генеральная уборка',
-      address: 'ул. Ленина, 10',
-      smallRooms: 2,
-      largeRooms: 1,
-      bathrooms: 1,
-      price: 6450,
-      estimatedTimeMinutes: 248,
-      status: 'open',
-      createdAt: new Date(),
-    },
-    {
-      id: 2,
-      clientName: 'Иван',
-      serviceType: 'Стандартная уборка помещений',
-      address: 'пр. Мира, 5',
-      smallRooms: 1,
-      largeRooms: 0,
-      bathrooms: 1,
-      price: 2300,
-      estimatedTimeMinutes: 90,
-      status: 'open',
-      createdAt: new Date(),
-    },
-  ];
+  constructor(
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
+  ) {}
 
-  async getOpenOrders(): Promise<OrderItem[]> {
-    return this.orders.filter(order => order.status === 'open');
-  }
-
-  async createOrder(dto: CreateOrderDto): Promise<OrderItem> {
+  async createOrder(dto: CreateOrderDto): Promise<Order> {
     const rooms: RoomCounts = {
       smallRooms: dto.smallRooms,
       largeRooms: dto.largeRooms,
@@ -68,8 +21,9 @@ export class OrderService {
 
     const estimate = calculateCleaning(rooms, dto.serviceType);
 
-    const newOrder: OrderItem = {
-      id: this.orders.length + 1,
+    const newOrder = this.orderRepository.create({
+      companyId: dto.companyId,
+      userId: dto.userId,
       clientName: dto.clientName,
       serviceType: dto.serviceType,
       address: dto.address,
@@ -79,28 +33,36 @@ export class OrderService {
       price: estimate.totalPrice,
       estimatedTimeMinutes: estimate.totalTimeMinutes,
       status: 'open',
-      createdAt: new Date(),
-    };
+    });
 
-    this.orders.push(newOrder);
-    return newOrder;
+    return await this.orderRepository.save(newOrder);
   }
 
-  async confirmOrder(orderId: number): Promise<OrderItem> {
-    const order = this.orders.find(o => o.id === orderId);
-    if (!order) {
-      throw new NotFoundException(`Заказ с ID ${orderId} не найден`);
-    }
+  async getCompanyOrders(companyId: number): Promise<Order[]> {
+    return await this.orderRepository.find({
+      where: { companyId },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async getUserOrders(userId: number): Promise<Order[]> {
+    return await this.orderRepository.find({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async confirmOrder(orderId: number): Promise<Order> {
+    const order = await this.orderRepository.findOne({ where: { id: orderId } });
+    if (!order) throw new NotFoundException('Заказ не найден');
     order.status = 'confirmed';
-    return order;
+    return await this.orderRepository.save(order);
   }
 
-  async cancelOrder(orderId: number): Promise<OrderItem> {
-    const order = this.orders.find(o => o.id === orderId);
-    if (!order) {
-      throw new NotFoundException(`Заказ с ID ${orderId} не найден`);
-    }
+  async cancelOrder(orderId: number): Promise<Order> {
+    const order = await this.orderRepository.findOne({ where: { id: orderId } });
+    if (!order) throw new NotFoundException('Заказ не найден');
     order.status = 'cancelled';
-    return order;
+    return await this.orderRepository.save(order);
   }
 }
