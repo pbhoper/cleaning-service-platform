@@ -36,7 +36,6 @@ export class AuthController {
 
   @Get('google/callback')
   async googleAuthRedirect(@Req() req) {
-
     return this.authService.socialLogin(req.user);
   }
 }

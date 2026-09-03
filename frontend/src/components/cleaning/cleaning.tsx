@@ -194,7 +194,7 @@ export const CompanySelectionModal: React.FC<CompanySelectionModalProps> = ({
         footer={null}
         width={760}
         centered
-        destroyOnClose
+        destroyOnHidden
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <Button type="text" icon={<ArrowLeftOutlined />} onClick={onBack} />

@@ -10,14 +10,40 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateClientDto = void 0;
+const mapped_types_1 = require("@nestjs/mapped-types");
+const create_client_dto_1 = require("./create-client.dto");
 const class_validator_1 = require("class-validator");
-class UpdateClientDto {
-    client;
+class UpdateClientDto extends (0, mapped_types_1.PartialType)(create_client_dto_1.CreateClientDto) {
+    username;
+    notificationsEnabled;
+    notificationHours;
+    avatar;
+    password;
 }
 exports.UpdateClientDto = UpdateClientDto;
 __decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateClientDto.prototype, "username", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], UpdateClientDto.prototype, "notificationsEnabled", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Number)
-], UpdateClientDto.prototype, "client", void 0);
+], UpdateClientDto.prototype, "notificationHours", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateClientDto.prototype, "avatar", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateClientDto.prototype, "password", void 0);
 //# sourceMappingURL=update-client.dto.js.map

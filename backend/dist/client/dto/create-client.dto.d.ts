@@ -4,4 +4,8 @@ export declare class CreateClientDto {
     phone: string;
     address?: string;
     isCorporate?: boolean;
+    notificationsEnabled?: boolean;
+    notificationHours?: number;
+    avatar?: string;
+    password?: string;
 }

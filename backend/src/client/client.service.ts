@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Not } from 'typeorm';
 import { Client } from './entities/client.entity';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -14,7 +14,7 @@ export class ClientService {
 
   async create(createClientDto: CreateClientDto): Promise<Client> {
     const existing = await this.clientRepository.findOne({
-      where: { email: createClientDto.email }
+      where: { email: createClientDto.email },
     });
     if (existing) {
       throw new ConflictException('Клиент с таким email уже существует');
@@ -38,7 +38,22 @@ export class ClientService {
 
   async update(id: number, updateClientDto: UpdateClientDto): Promise<Client> {
     const client = await this.findOne(id);
-    Object.assign(client, updateClientDto);
+
+    if (updateClientDto.email && updateClientDto.email !== client.email) {
+      const existing = await this.clientRepository.findOne({
+        where: { email: updateClientDto.email, id: Not(id) },
+      });
+      if (existing) {
+        throw new ConflictException('Клиент с таким email уже существует');
+      }
+    }
+
+    const { username, ...dtoData } = updateClientDto;
+    if (username) {
+      dtoData.name = username;
+    }
+
+    Object.assign(client, dtoData);
     return await this.clientRepository.save(client);
   }
 
