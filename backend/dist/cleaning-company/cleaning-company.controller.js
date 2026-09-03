@@ -24,6 +24,9 @@ let CleaningCompanyController = class CleaningCompanyController {
     async register(dto) {
         return this.companyService.create(dto);
     }
+    async findAll() {
+        return this.companyService.findAll();
+    }
     async getProfile(id) {
         return this.companyService.findById(id);
     }
@@ -39,6 +42,12 @@ __decorate([
     __metadata("design:paramtypes", [create_cleaning_company_dto_1.CreateCleaningCompanyDto]),
     __metadata("design:returntype", Promise)
 ], CleaningCompanyController.prototype, "register", null);
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], CleaningCompanyController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),

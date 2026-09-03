@@ -24,7 +24,6 @@ export class CleaningCompanyService {
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-
     const company = this.companyRepository.create({
       ...dto,
       password: hashedPassword,
@@ -32,7 +31,6 @@ export class CleaningCompanyService {
     });
 
     const savedCompany = await this.companyRepository.save(company);
-
     const payload = {
       sub: savedCompany.id,
       email: savedCompany.email,
@@ -40,7 +38,6 @@ export class CleaningCompanyService {
     };
 
     const token = this.jwtService.sign(payload);
-
     const { password, ...companyData } = savedCompany;
 
     return {
@@ -49,6 +46,10 @@ export class CleaningCompanyService {
       user_role: savedCompany.role,
       company: companyData,
     };
+  }
+
+  async findAll(): Promise<CleaningCompanyEntity[]> {
+    return await this.companyRepository.find();
   }
 
   async findByEmail(email: string): Promise<CleaningCompanyEntity | null> {

@@ -21,4 +21,6 @@ export declare class CleaningCompanyEntity {
     rating: number;
     createdAt: Date;
     updatedAt: Date;
+    status: 'active' | 'blocked';
+    blockReason: string;
 }
