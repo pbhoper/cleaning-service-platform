@@ -29,8 +29,11 @@ export declare class CleaningCompanyController {
             rating: number;
             createdAt: Date;
             updatedAt: Date;
+            status: "active" | "blocked";
+            blockReason: string;
         };
     }>;
+    findAll(): Promise<import("./entities/cleaning-company.entity").CleaningCompanyEntity[]>;
     getProfile(id: number): Promise<import("./entities/cleaning-company.entity").CleaningCompanyEntity>;
     updateProfile(id: number, dto: Partial<CreateCleaningCompanyDto>): Promise<import("./entities/cleaning-company.entity").CleaningCompanyEntity>;
 }

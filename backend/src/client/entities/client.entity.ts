@@ -37,4 +37,10 @@ export class Client {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ default: 'active' })
+  status: 'active' | 'blocked';
+
+  @Column({ nullable: true })
+  blockReason: string;
 }

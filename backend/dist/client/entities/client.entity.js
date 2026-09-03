@@ -24,6 +24,8 @@ let Client = class Client {
     password;
     createdAt;
     updatedAt;
+    status;
+    blockReason;
 };
 exports.Client = Client;
 __decorate([
@@ -74,6 +76,14 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
 ], Client.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'active' }),
+    __metadata("design:type", String)
+], Client.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Client.prototype, "blockReason", void 0);
 exports.Client = Client = __decorate([
     (0, typeorm_1.Entity)('clients')
 ], Client);

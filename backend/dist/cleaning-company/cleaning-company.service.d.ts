@@ -32,8 +32,11 @@ export declare class CleaningCompanyService {
             rating: number;
             createdAt: Date;
             updatedAt: Date;
+            status: "active" | "blocked";
+            blockReason: string;
         };
     }>;
+    findAll(): Promise<CleaningCompanyEntity[]>;
     findByEmail(email: string): Promise<CleaningCompanyEntity | null>;
     findById(id: number): Promise<CleaningCompanyEntity>;
     update(id: number, dto: Partial<CreateCleaningCompanyDto>): Promise<CleaningCompanyEntity>;

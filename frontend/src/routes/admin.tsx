@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Table,
@@ -12,6 +12,7 @@ import {
   Layout,
   Avatar,
   message,
+  Spin,
 } from 'antd';
 import {
   UserOutlined,
@@ -21,6 +22,7 @@ import {
   TeamOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
+import { api } from '../api/axios';
 
 const { Title, Text } = Typography;
 const { Header, Content } = Layout;
@@ -42,22 +44,11 @@ export interface CleaningCompanyUser {
   blockReason?: string;
 }
 
-const INITIAL_CLIENTS: ClientUser[] = [
-  { id: 1, name: 'Алексей Иванов', email: 'alexey@example.com', phone: '+7 (999) 111-22-33', status: 'active' },
-  { id: 2, name: 'Елена Петрова', email: 'elena@example.com', phone: '+7 (999) 222-33-44', status: 'blocked', blockReason: 'Систематические отмены заказов' },
-];
-
-const INITIAL_COMPANIES: CleaningCompanyUser[] = [
-  { id: 1, name: 'ООО Чистый Дом', email: 'clean@house.ru', status: 'active' },
-  { id: 2, name: 'ИП Блеск и Чистота', email: 'blesk@clean.ru', status: 'blocked', blockReason: 'Жалобы клиентов на качество' },
-];
-
 export const AdminPage: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const [clients, setClients] = useState<ClientUser[]>(INITIAL_CLIENTS);
-  const [companies, setCompanies] = useState<CleaningCompanyUser[]>(INITIAL_COMPANIES);
-
+  const [loading, setLoading] = useState(false);
+  const [clients, setClients] = useState<ClientUser[]>([]);
+  const [companies, setCompanies] = useState<CleaningCompanyUser[]>([]);
   const [activeTarget, setActiveTarget] = useState<{
     item: ClientUser | CleaningCompanyUser;
     type: 'client' | 'company';
@@ -67,6 +58,41 @@ export const AdminPage: React.FC = () => {
   const [isUnblockModalOpen, setIsUnblockModalOpen] = useState(false);
   const [blockForm] = Form.useForm();
   const [loginForm] = Form.useForm();
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [clientsRes, companiesRes] = await Promise.all([
+        api.get('/clients'),
+        api.get('/cleaning-company'),
+      ]);
+
+      setClients(
+        clientsRes.data.map((item: any) => ({
+          ...item,
+          name: item.name || item.username || 'Без имени',
+          status: item.status || 'active',
+        }))
+      );
+
+      setCompanies(
+        companiesRes.data.map((item: any) => ({
+          ...item,
+          status: item.status || 'active',
+        }))
+      );
+    } catch (error) {
+      message.error('Ошибка при загрузке списка пользователей');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchData();
+    }
+  }, [isAuthenticated]);
 
   const handleLogin = (values: any) => {
     if (values.email === 'admin@platform.ru' && values.password === 'admin123') {
@@ -93,25 +119,22 @@ export const AdminPage: React.FC = () => {
       if (!activeTarget) return;
 
       const { item, type } = activeTarget;
+      const endpoint = type === 'client' ? `/clients/${item.id}` : `/cleaning-company/${item.id}`;
 
-      if (type === 'client') {
-        setClients((prev) =>
-          prev.map((c) => (c.id === item.id ? { ...c, status: 'blocked', blockReason: values.reason } : c))
-        );
-        message.error(`Клиент ${item.name} заблокирован`);
-      } else {
-        setCompanies((prev) =>
-          prev.map((c) => (c.id === item.id ? { ...c, status: 'blocked', blockReason: values.reason } : c))
-        );
-        message.error(`Служба "${item.name}" заблокирована`);
-      }
+      await api.patch(endpoint, {
+        status: 'blocked',
+        blockReason: values.reason,
+      });
 
-      console.log(`[Уведомление]: Отправлено сообщение о блокировке на ${item.email}. Причина: ${values.reason}`);
+      message.error(`${type === 'client' ? 'Клиент' : 'Служба'} "${item.name}" заблокирована`);
 
       blockForm.resetFields();
       setIsBlockModalOpen(false);
       setActiveTarget(null);
-    } catch {}
+      fetchData();
+    } catch (error) {
+      message.error('Ошибка при попытке заблокировать пользователя');
+    }
   };
 
   const handleOpenUnblockModal = (item: ClientUser | CleaningCompanyUser, type: 'client' | 'company') => {
@@ -119,27 +142,26 @@ export const AdminPage: React.FC = () => {
     setIsUnblockModalOpen(true);
   };
 
-  const handleConfirmUnblock = () => {
+  const handleConfirmUnblock = async () => {
     if (!activeTarget) return;
 
-    const { item, type } = activeTarget;
+    try {
+      const { item, type } = activeTarget;
+      const endpoint = type === 'client' ? `/clients/${item.id}` : `/cleaning-company/${item.id}`;
 
-    if (type === 'client') {
-      setClients((prev) =>
-        prev.map((c) => (c.id === item.id ? { ...c, status: 'active', blockReason: undefined } : c))
-      );
-      message.success(`Клиент ${item.name} разблокирован`);
-    } else {
-      setCompanies((prev) =>
-        prev.map((c) => (c.id === item.id ? { ...c, status: 'active', blockReason: undefined } : c))
-      );
-      message.success(`Служба "${item.name}" разблокирована`);
+      await api.patch(endpoint, {
+        status: 'active',
+        blockReason: null,
+      });
+
+      message.success(`${type === 'client' ? 'Клиент' : 'Служба'} "${item.name}" разблокирована`);
+
+      setIsUnblockModalOpen(false);
+      setActiveTarget(null);
+      fetchData();
+    } catch (error) {
+      message.error('Ошибка при попытке разблокировать пользователя');
     }
-
-    console.log(`[Уведомление]: Отправлено сообщение о разблокировке на ${item.email}`);
-
-    setIsUnblockModalOpen(false);
-    setActiveTarget(null);
   };
 
   const clientColumns = [
@@ -150,7 +172,7 @@ export const AdminPage: React.FC = () => {
       render: (r: ClientUser) => (
         <div>
           <div>{r.email}</div>
-          <Text type="secondary" style={{ fontSize: 12 }}>{r.phone}</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>{r.phone || '—'}</Text>
         </div>
       ),
     },
@@ -252,37 +274,39 @@ export const AdminPage: React.FC = () => {
       </Header>
 
       <Content style={{ maxWidth: 1100, width: '100%', margin: '24px auto', padding: '0 16px' }}>
-        <Tabs
-          type="card"
-          items={[
-            {
-              key: 'clients',
-              label: (
-                <span>
-                  <UserOutlined /> Список клиентов
-                </span>
-              ),
-              children: (
-                <Card title="Управление клиентами">
-                  <Table dataSource={clients} columns={clientColumns} rowKey="id" pagination={{ pageSize: 5 }} />
-                </Card>
-              ),
-            },
-            {
-              key: 'companies',
-              label: (
-                <span>
-                  <TeamOutlined /> Список клининговых служб
-                </span>
-              ),
-              children: (
-                <Card title="Управление клининговыми службами">
-                  <Table dataSource={companies} columns={companyColumns} rowKey="id" pagination={{ pageSize: 5 }} />
-                </Card>
-              ),
-            },
-          ]}
-        />
+        <Spin spinning={loading}>
+          <Tabs
+            type="card"
+            items={[
+              {
+                key: 'clients',
+                label: (
+                  <span>
+                    <UserOutlined /> Список клиентов
+                  </span>
+                ),
+                children: (
+                  <Card title="Управление клиентами">
+                    <Table dataSource={clients} columns={clientColumns} rowKey="id" pagination={{ pageSize: 5 }} />
+                  </Card>
+                ),
+              },
+              {
+                key: 'companies',
+                label: (
+                  <span>
+                    <TeamOutlined /> Список клининговых служб
+                  </span>
+                ),
+                children: (
+                  <Card title="Управление клининговыми службами">
+                    <Table dataSource={companies} columns={companyColumns} rowKey="id" pagination={{ pageSize: 5 }} />
+                  </Card>
+                ),
+              },
+            ]}
+          />
+        </Spin>
       </Content>
 
       <Modal
@@ -317,9 +341,6 @@ export const AdminPage: React.FC = () => {
         cancelText="Отмена"
       >
         <p>Вы уверены, что хотите разблокировать <b>{activeTarget?.item.name}</b>?</p>
-        <Text type="secondary">
-          Пользователю/службе будет отправлено автоматическое уведомление о восстановлении доступа.
-        </Text>
       </Modal>
     </Layout>
   );

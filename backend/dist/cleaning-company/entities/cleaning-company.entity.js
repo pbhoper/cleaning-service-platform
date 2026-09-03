@@ -30,6 +30,8 @@ let CleaningCompanyEntity = class CleaningCompanyEntity {
     rating;
     createdAt;
     updatedAt;
+    status;
+    blockReason;
 };
 exports.CleaningCompanyEntity = CleaningCompanyEntity;
 __decorate([
@@ -104,6 +106,14 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
 ], CleaningCompanyEntity.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'active' }),
+    __metadata("design:type", String)
+], CleaningCompanyEntity.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], CleaningCompanyEntity.prototype, "blockReason", void 0);
 exports.CleaningCompanyEntity = CleaningCompanyEntity = __decorate([
     (0, typeorm_1.Entity)('cleaning_companies')
 ], CleaningCompanyEntity);

@@ -87,6 +87,9 @@ let CleaningCompanyService = class CleaningCompanyService {
             company: companyData,
         };
     }
+    async findAll() {
+        return await this.companyRepository.find();
+    }
     async findByEmail(email) {
         return this.companyRepository.findOne({ where: { email } });
     }

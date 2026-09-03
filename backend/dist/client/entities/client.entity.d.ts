@@ -11,4 +11,6 @@ export declare class Client {
     password?: string;
     createdAt: Date;
     updatedAt: Date;
+    status: 'active' | 'blocked';
+    blockReason: string;
 }

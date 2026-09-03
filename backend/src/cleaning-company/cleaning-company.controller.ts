@@ -11,16 +11,18 @@ export class CleaningCompanyController {
     return this.companyService.create(dto);
   }
 
+  @Get()
+  async findAll() {
+    return this.companyService.findAll();
+  }
+
   @Get(':id')
   async getProfile(@Param('id', ParseIntPipe) id: number) {
     return this.companyService.findById(id);
   }
 
   @Patch(':id')
-  async updateProfile(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: Partial<CreateCleaningCompanyDto>,
-  ) {
+  async updateProfile(@Param('id', ParseIntPipe) id: number, @Body() dto: Partial<CreateCleaningCompanyDto>,) {
     return this.companyService.update(id, dto);
   }
 }
