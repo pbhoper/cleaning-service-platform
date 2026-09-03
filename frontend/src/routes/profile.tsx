@@ -33,6 +33,7 @@ export const Route = createFileRoute('/profile')({
 function ProfilePage() {
   const navigate = useNavigate();
   const token = localStorage.getItem('access_token');
+  const userId = localStorage.getItem('user_id');
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -40,15 +41,15 @@ function ProfilePage() {
   const notifyEnabled = Form.useWatch('notificationsEnabled', form);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || !userId) return;
 
     const fetchProfile = async () => {
       try {
-        const response = await api.get('/users/profile');
-
+        const response = await api.get(`/clients/${userId}`);
         const userData = response.data;
+
         form.setFieldsValue({
-          username: userData.username || userData.firstName || '',
+          name: userData.name || userData.username || '',
           email: userData.email || '',
           phone: userData.phone || '',
           address: userData.address || '',
@@ -65,9 +66,9 @@ function ProfilePage() {
     };
 
     fetchProfile();
-  }, [token, form]);
+  }, [token, userId, form]);
 
-  if (!token) {
+  if (!token || !userId) {
     return (
       <div style={{ padding: '60px 20px', textAlign: 'center' }}>
         <Result
@@ -88,18 +89,17 @@ function ProfilePage() {
     setLoading(true);
     try {
       const payload = {
-        username: values.username,
+        name: values.name,
         email: values.email,
         phone: values.phone,
         address: values.address,
         notificationsEnabled: values.notificationsEnabled,
         notificationHours: values.notificationsEnabled ? values.notificationHours : null,
-        oldPassword: values.oldPassword || undefined,
-        newPassword: values.newPassword || undefined,
+        ...(values.newPassword && { password: values.newPassword }),
         avatar: avatarUrl,
       };
 
-      await api.patch('/users/profile', payload);
+      await api.patch(`/clients/${userId}`, payload);
 
       message.success('Профиль успешно обновлен!');
     } catch (error: any) {
@@ -125,7 +125,7 @@ function ProfilePage() {
 
   return (
     <div style={{ maxWidth: 680, margin: '40px auto', padding: '0 16px' }}>
-      <Card bordered={false} style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.08)', borderRadius: 12 }}>
+      <Card variant="borderless" style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.08)', borderRadius: 12 }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <Title level={3} style={{ marginBottom: 4 }}>
             Редактирование профиля
@@ -144,7 +144,7 @@ function ProfilePage() {
           size="large"
         >
           <Form.Item label="Фотография профиля" style={{ textAlign: 'center' }}>
-            <Space direction="vertical" align="center">
+            <Space orientation="vertical" align="center">
               <Avatar
                 size={80}
                 src={avatarUrl}
@@ -167,7 +167,7 @@ function ProfilePage() {
           <Divider />
 
           <Form.Item
-            name="username"
+            name="name"
             label="Имя пользователя"
             rules={[{ required: true, message: 'Введите имя пользователя' }]}
           >
@@ -231,7 +231,12 @@ function ProfilePage() {
               label="За сколько часов до уборки отправлять напоминание?"
               rules={[{ required: true, message: 'Укажите время' }]}
             >
-              <InputNumber min={1} max={72} addonAfter="ч." style={{ width: '100%' }} />
+              <Space.Compact style={{ width: '100%' }}>
+                <InputNumber min={1} max={72} style={{ width: '100%' }} />
+                <Button disabled style={{ color: 'rgba(0,0,0,0.88)', cursor: 'default' }}>
+                  ч.
+                </Button>
+              </Space.Compact>
             </Form.Item>
           )}
 

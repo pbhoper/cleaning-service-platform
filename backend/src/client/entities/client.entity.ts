@@ -5,13 +5,13 @@ export class Client {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   name: string;
 
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: true })
   phone: string;
 
   @Column({ nullable: true })
@@ -19,6 +19,18 @@ export class Client {
 
   @Column({ default: false })
   isCorporate: boolean;
+
+  @Column({ default: true })
+  notificationsEnabled: boolean;
+
+  @Column({ nullable: true, default: 2 })
+  notificationHours: number;
+
+  @Column({ nullable: true, type: 'text' })
+  avatar: string;
+
+  @Column({ nullable: true })
+  password?: string;
 
   @CreateDateColumn()
   createdAt: Date;

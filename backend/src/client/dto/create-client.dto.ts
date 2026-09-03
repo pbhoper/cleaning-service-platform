@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, IsOptional, IsBoolean } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsOptional, IsBoolean, IsNumber } from 'class-validator';
 
 export class CreateClientDto {
   @IsString()
@@ -19,4 +19,20 @@ export class CreateClientDto {
   @IsBoolean()
   @IsOptional()
   isCorporate?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  notificationsEnabled?: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  notificationHours?: number;
+
+  @IsString()
+  @IsOptional()
+  avatar?: string;
+
+  @IsString()
+  @IsOptional()
+  password?: string;
 }

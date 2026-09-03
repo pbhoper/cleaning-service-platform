@@ -24,7 +24,7 @@ let ClientService = class ClientService {
     }
     async create(createClientDto) {
         const existing = await this.clientRepository.findOne({
-            where: { email: createClientDto.email }
+            where: { email: createClientDto.email },
         });
         if (existing) {
             throw new common_1.ConflictException('Клиент с таким email уже существует');
@@ -44,7 +44,19 @@ let ClientService = class ClientService {
     }
     async update(id, updateClientDto) {
         const client = await this.findOne(id);
-        Object.assign(client, updateClientDto);
+        if (updateClientDto.email && updateClientDto.email !== client.email) {
+            const existing = await this.clientRepository.findOne({
+                where: { email: updateClientDto.email, id: (0, typeorm_2.Not)(id) },
+            });
+            if (existing) {
+                throw new common_1.ConflictException('Клиент с таким email уже существует');
+            }
+        }
+        const { username, ...dtoData } = updateClientDto;
+        if (username) {
+            dtoData.name = username;
+        }
+        Object.assign(client, dtoData);
         return await this.clientRepository.save(client);
     }
     async remove(id) {

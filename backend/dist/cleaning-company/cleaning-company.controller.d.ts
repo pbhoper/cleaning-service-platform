@@ -1,5 +1,5 @@
 import { CleaningCompanyService } from './cleaning-company.service';
-import { CreateCleaningCompanyDto } from "./dto/create-cleaning-company.dto";
+import { CreateCleaningCompanyDto } from './dto/create-cleaning-company.dto';
 export declare class CleaningCompanyController {
     private readonly companyService;
     constructor(companyService: CleaningCompanyService);
@@ -32,4 +32,5 @@ export declare class CleaningCompanyController {
         };
     }>;
     getProfile(id: number): Promise<import("./entities/cleaning-company.entity").CleaningCompanyEntity>;
+    updateProfile(id: number, dto: Partial<CreateCleaningCompanyDto>): Promise<import("./entities/cleaning-company.entity").CleaningCompanyEntity>;
 }

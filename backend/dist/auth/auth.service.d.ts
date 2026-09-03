@@ -14,7 +14,7 @@ export declare class AuthService {
     }>;
     login(dto: LoginAuthDto): Promise<{
         access_token: string;
-        user_role: "user" | "company";
+        user_role: "company" | "user";
         user_id: number;
     }>;
     confirmEmail(token: string): Promise<{
@@ -22,7 +22,7 @@ export declare class AuthService {
     }>;
     socialLogin(profile: any): Promise<{
         access_token: string;
-        user_role: "user" | "company";
+        user_role: "company" | "user";
         user_id: number;
     }>;
     private generateTokens;

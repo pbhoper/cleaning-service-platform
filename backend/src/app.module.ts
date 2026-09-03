@@ -11,6 +11,7 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import {AuthModule} from "./auth/auth.module";
 import {UserModule} from "./user-role/user.module";
 import { RatingModule } from "./rating/rating.module";
+import {ClientModule} from "./client/client.module";
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { RatingModule } from "./rating/rating.module";
     OrderModule,
     EmailSmsModule,
     CleaningCompanyModule,
+    ClientModule,
   ],
   controllers: [AppController],
   providers: [AppService],

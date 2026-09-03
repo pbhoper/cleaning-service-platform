@@ -17,8 +17,8 @@ export const Header = () => {
 
       <nav className={styles.nav}>
         <Link to="/">Главная</Link>
-        <a href="#services">Услуги</a>
-        <a href="#contacts">Контакты</a>
+         <a href="#services">Услуги</a>
+         <a href="#contacts">Контакты</a>
         <Link to="/reports">Оставить Отзыв</Link>
       </nav>
 

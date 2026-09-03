@@ -18,6 +18,10 @@ let Client = class Client {
     phone;
     address;
     isCorporate;
+    notificationsEnabled;
+    notificationHours;
+    avatar;
+    password;
     createdAt;
     updatedAt;
 };
@@ -35,7 +39,7 @@ __decorate([
     __metadata("design:type", String)
 ], Client.prototype, "email", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Client.prototype, "phone", void 0);
 __decorate([
@@ -46,6 +50,22 @@ __decorate([
     (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)
 ], Client.prototype, "isCorporate", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: true }),
+    __metadata("design:type", Boolean)
+], Client.prototype, "notificationsEnabled", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true, default: 2 }),
+    __metadata("design:type", Number)
+], Client.prototype, "notificationHours", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true, type: 'text' }),
+    __metadata("design:type", String)
+], Client.prototype, "avatar", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Client.prototype, "password", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

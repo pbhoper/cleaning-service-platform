@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import {CleaningCompanyEntity} from "./entities/cleaning-company.entity";
-import {CreateCleaningCompanyDto} from "./dto/create-cleaning-company.dto";
+import { CleaningCompanyEntity } from './entities/cleaning-company.entity';
+import { CreateCleaningCompanyDto } from './dto/create-cleaning-company.dto';
 
 @Injectable()
 export class CleaningCompanyService {
@@ -61,5 +61,16 @@ export class CleaningCompanyService {
       throw new NotFoundException('Компания не найдена');
     }
     return company;
+  }
+
+  async update(id: number, dto: Partial<CreateCleaningCompanyDto>): Promise<CleaningCompanyEntity> {
+    const company = await this.findById(id);
+
+    if (dto.password) {
+      dto.password = await bcrypt.hash(dto.password, 10);
+    }
+
+    this.companyRepository.merge(company, dto);
+    return await this.companyRepository.save(company);
   }
 }

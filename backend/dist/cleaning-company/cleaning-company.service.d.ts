@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { CleaningCompanyEntity } from "./entities/cleaning-company.entity";
-import { CreateCleaningCompanyDto } from "./dto/create-cleaning-company.dto";
+import { CleaningCompanyEntity } from './entities/cleaning-company.entity';
+import { CreateCleaningCompanyDto } from './dto/create-cleaning-company.dto';
 export declare class CleaningCompanyService {
     private readonly companyRepository;
     private readonly jwtService;
@@ -36,4 +36,5 @@ export declare class CleaningCompanyService {
     }>;
     findByEmail(email: string): Promise<CleaningCompanyEntity | null>;
     findById(id: number): Promise<CleaningCompanyEntity>;
+    update(id: number, dto: Partial<CreateCleaningCompanyDto>): Promise<CleaningCompanyEntity>;
 }

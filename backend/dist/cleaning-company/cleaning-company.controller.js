@@ -27,6 +27,9 @@ let CleaningCompanyController = class CleaningCompanyController {
     async getProfile(id) {
         return this.companyService.findById(id);
     }
+    async updateProfile(id, dto) {
+        return this.companyService.update(id, dto);
+    }
 };
 exports.CleaningCompanyController = CleaningCompanyController;
 __decorate([
@@ -43,6 +46,14 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], CleaningCompanyController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], CleaningCompanyController.prototype, "updateProfile", null);
 exports.CleaningCompanyController = CleaningCompanyController = __decorate([
     (0, common_1.Controller)('cleaning-company'),
     __metadata("design:paramtypes", [cleaning_company_service_1.CleaningCompanyService])

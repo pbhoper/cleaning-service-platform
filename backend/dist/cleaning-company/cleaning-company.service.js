@@ -97,6 +97,14 @@ let CleaningCompanyService = class CleaningCompanyService {
         }
         return company;
     }
+    async update(id, dto) {
+        const company = await this.findById(id);
+        if (dto.password) {
+            dto.password = await bcrypt.hash(dto.password, 10);
+        }
+        this.companyRepository.merge(company, dto);
+        return await this.companyRepository.save(company);
+    }
 };
 exports.CleaningCompanyService = CleaningCompanyService;
 exports.CleaningCompanyService = CleaningCompanyService = __decorate([

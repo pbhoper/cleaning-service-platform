@@ -68,18 +68,8 @@ interface CompanyDashboardProps {
 }
 
 const MONTH_NAMES = [
-  'Январь',
-  'Февраль',
-  'Март',
-  'Апрель',
-  'Май',
-  'Июнь',
-  'Июль',
-  'Август',
-  'Сентябрь',
-  'Октябрь',
-  'Ноябрь',
-  'Декабрь',
+  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
 ];
 
 const INITIAL_REVIEWS: Review[] = [
@@ -93,6 +83,7 @@ const INITIAL_REVIEWS: Review[] = [
 export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompanyData }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [savingProfile, setSavingProfile] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState<boolean>(false);
   const [cancelModalOpen, setCancelModalOpen] = useState<boolean>(false);
@@ -118,24 +109,31 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
     }
   };
 
-  useEffect(() => {
-    fetchCompanyOrders();
-  }, [companyId]);
+  const fetchCompanyProfile = async () => {
+    try {
+      const res = await fetch(`http://localhost:3000/cleaning-company/${companyId}`);
+      if (res.ok) {
+        const data = await res.json();
+        profileForm.setFieldsValue({
+          name: data.name || '',
+          address: data.address || '',
+          description: data.description || '',
+          logo: data.logo || '',
+          serviceTypes: data.serviceTypes || [],
+          priceSmallRoom: data.priceSmallRoom || data.basePrices?.smallRoom || 0,
+          priceLargeRoom: data.priceLargeRoom || data.basePrices?.largeRoom || 0,
+          priceBathroom: data.priceBathroom || data.basePrices?.bathroom || 0,
+        });
+      }
+    } catch {
+      message.error('Не удалось загрузить данные профиля компании');
+    }
+  };
 
   useEffect(() => {
-    if (initialCompanyData) {
-      profileForm.setFieldsValue({
-        name: initialCompanyData.name,
-        address: initialCompanyData.address,
-        description: initialCompanyData.description,
-        logo: initialCompanyData.logo,
-        serviceTypes: initialCompanyData.serviceTypes,
-        priceSmallRoom: initialCompanyData.basePrices?.smallRoom,
-        priceLargeRoom: initialCompanyData.basePrices?.largeRoom,
-        priceBathroom: initialCompanyData.basePrices?.bathroom,
-      });
-    }
-  }, [initialCompanyData, profileForm]);
+    fetchCompanyOrders();
+    fetchCompanyProfile();
+  }, [companyId]);
 
   const handleConfirmOrder = async (orderId: number) => {
     try {
@@ -178,12 +176,42 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
     }
   };
 
-  const handleSaveProfile = (values: any) => {
+  const handleSaveProfile = async (values: any) => {
     if (values.newPassword && values.newPassword !== values.confirmPassword) {
       message.error('Новые пароли не совпадают!');
       return;
     }
-    message.success('Данные профиля успешно обновлены!');
+
+    setSavingProfile(true);
+    try {
+      const payload = {
+        name: values.name,
+        address: values.address,
+        description: values.description,
+        logo: values.logo,
+        serviceTypes: values.serviceTypes,
+        priceSmallRoom: Number(values.priceSmallRoom || 0),
+        priceLargeRoom: Number(values.priceLargeRoom || 0),
+        priceBathroom: Number(values.priceBathroom || 0),
+        ...(values.newPassword && { password: values.newPassword }),
+      };
+
+      const res = await fetch(`http://localhost:3000/cleaning-company/${companyId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error();
+      message.success('Данные профиля компании успешно обновлены!');
+    } catch {
+      message.error('Ошибка при сохранении профиля компании');
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   const formatMinutes = (totalMinutes: number) => {
@@ -401,21 +429,7 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
               <Row gutter={24}>
                 <Col xs={24} lg={14}>
                   <Card title="Редактирование профиля службы">
-                    <Form
-                      form={profileForm}
-                      layout="vertical"
-                      onFinish={handleSaveProfile}
-                      initialValues={{
-                        name: 'ООО Чистый Дом',
-                        address: 'г. Москва, ул. Мира, д. 5',
-                        description: 'Профессиональная уборка квартир и офисов любой сложности.',
-                        logo: '',
-                        serviceTypes: ['Стандартная уборка', 'Генеральная уборка'],
-                        priceSmallRoom: 800,
-                        priceLargeRoom: 1200,
-                        priceBathroom: 1500,
-                      }}
-                    >
+                    <Form form={profileForm} layout="vertical" onFinish={handleSaveProfile}>
                       <Form.Item name="logo" label="URL логотипа">
                         <Input />
                       </Form.Item>
@@ -479,7 +493,14 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
                       </Row>
 
                       <Form.Item style={{ marginTop: 16 }}>
-                        <Button type="primary" htmlType="submit" icon={<SaveOutlined />} block size="large">
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          icon={<SaveOutlined />}
+                          block
+                          size="large"
+                          loading={savingProfile}
+                        >
                           Сохранить изменения
                         </Button>
                       </Form.Item>
@@ -490,7 +511,9 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
                 <Col xs={24} lg={10}>
                   <Card title="Рейтинг и отзывы">
                     <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                      <Title level={2} style={{ margin: 0 }}>4.8</Title>
+                      <Title level={2} style={{ margin: 0 }}>
+                        4.8
+                      </Title>
                       <Rate disabled defaultValue={4.8} allowHalf character={<StarOutlined />} />
                       <div style={{ marginTop: 4 }}>
                         <Text type="secondary">На основе {reviews.length} отзывов</Text>
@@ -506,7 +529,9 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({ initialCompa
                         <List.Item key={review.id} style={{ padding: '12px 0' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Text strong>{review.author}</Text>
-                            <Text type="secondary" style={{ fontSize: 12 }}>{review.date}</Text>
+                            <Text type="secondary" style={{ fontSize: 12 }}>
+                              {review.date}
+                            </Text>
                           </div>
                           <Rate disabled defaultValue={review.rating} style={{ fontSize: 12, margin: '4px 0' }} />
                           <Paragraph style={{ margin: 0, fontSize: 13 }}>{review.comment}</Paragraph>
