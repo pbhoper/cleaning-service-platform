@@ -5,17 +5,11 @@ set -e
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR -- \
   '*.js' '*.mjs' '*.cjs' '*.ts' '*.tsx' '*.json' '*.md')
 
-[ -z "$STAGED_FILES" ] && exit 0
-
-echo "Formatting staged files..."
-npx --no-install prettier --write -- $STAGED_FILES
-
-LINT_FILES=$(git diff --cached --name-only --diff-filter=ACMR -- \
-  '*.js' '*.mjs' '*.cjs' '*.ts' '*.tsx')
-
-if [ -n "$LINT_FILES" ]; then
-  echo "Linting staged JavaScript and TypeScript files..."
-  npx --no-install eslint --fix -- $LINT_FILES
+if [ -n "$STAGED_FILES" ]; then
+  echo "Formatting staged files..."
+  npx --no-install prettier --write -- $STAGED_FILES
+  git add -- $STAGED_FILES
 fi
 
-git add -- $STAGED_FILES
+echo "Linting the project..."
+npx --no-install eslint . --fix
