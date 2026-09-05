@@ -22,7 +22,10 @@ export class CleaningCompanyController {
   }
 
   @Patch(':id')
-  async updateProfile(@Param('id', ParseIntPipe) id: number, @Body() dto: Partial<CreateCleaningCompanyDto>,) {
+  async updateProfile(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: Partial<CreateCleaningCompanyDto>,
+  ) {
     return this.companyService.update(id, dto);
   }
 }

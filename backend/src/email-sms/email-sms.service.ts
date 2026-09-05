@@ -2,16 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateEmailSmDto } from './dto/create-email-sm.dto';
-import {
-  EmailSmsEntity,
-  NotificationType,
-  NotificationStatus,
-} from './entities/email-sm.entity';
+import { EmailSmsEntity, NotificationType, NotificationStatus } from './entities/email-sm.entity';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailSmsService {
-  private transporter;
+  private readonly transporter;
 
   constructor(
     @InjectRepository(EmailSmsEntity)
@@ -43,17 +39,14 @@ export class EmailSmsService {
         });
       } catch (error: unknown) {
         status = NotificationStatus.FAILED;
-        errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Не удалось отправить email';
+        errorMessage = error instanceof Error ? error.message : 'Не удалось отправить email';
       }
     } else if (type === 'sms') {
       console.log(`Отправка SMS на номер ${recipient}: ${message}`);
     }
 
     const notification = this.emailSmsRepository.create({
-      type: type as NotificationType,
+      type: type,
       recipient,
       message,
       status,
@@ -74,6 +67,7 @@ export class EmailSmsService {
     if (!notification) {
       throw new NotFoundException(`Уведомление #${id} не найдено`);
     }
+
     return notification;
   }
 
@@ -82,6 +76,7 @@ export class EmailSmsService {
     if (result.affected === 0) {
       throw new NotFoundException(`Уведомление #${id} не найдено`);
     }
+
     return { success: true, message: `Сообщение #${id} удалено` };
   }
 }

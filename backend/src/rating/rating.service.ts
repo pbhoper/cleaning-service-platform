@@ -11,10 +11,14 @@ export interface RatingItem {
 
 @Injectable()
 export class RatingService {
-
   private readonly ratings: RatingItem[] = [];
 
-  async createRating(rateData: { clientId: string; companyId: string; rating: number; comment?: string }) {
+  async createRating(rateData: {
+    clientId: string;
+    companyId: string;
+    rating: number;
+    comment?: string;
+  }) {
     const newRating: RatingItem = {
       id: this.ratings.length + 1,
       ...rateData,
@@ -31,7 +35,7 @@ export class RatingService {
   }
 
   async getCompanyRatings(companyId: string) {
-    const companyRatings = this.ratings.filter(r => r.companyId === companyId);
+    const companyRatings = this.ratings.filter((r) => r.companyId === companyId);
     return {
       success: true,
       data: companyRatings,

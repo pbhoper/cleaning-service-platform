@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { CleaningCompanyService } from './cleaning-company.service';
 import { CleaningCompanyController } from './cleaning-company.controller';
-import {CleaningCompanyEntity} from "./entities/cleaning-company.entity";
+import { CleaningCompanyEntity } from './entities/cleaning-company.entity';
 
 @Module({
   imports: [

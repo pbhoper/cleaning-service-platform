@@ -1,14 +1,10 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserRole } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {Role} from "./enum/user.enum";
+import { Role } from './enum/user.enum';
 
 @Injectable()
 export class UserService {
@@ -39,6 +35,7 @@ export class UserService {
     if (!role) {
       throw new NotFoundException(`Роль с ID #${id} не найдена`);
     }
+
     return role;
   }
 
@@ -63,5 +60,4 @@ export class UserService {
       ]);
     }
   }
-
 }

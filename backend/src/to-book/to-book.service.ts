@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  BadRequestException
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ToBookEntity } from './entities/to-book.entity';
@@ -12,7 +9,7 @@ export class ToBookService {
   constructor(
     @InjectRepository(ToBookEntity)
     private readonly toBookRepository: Repository<ToBookEntity>,
-  ) { }
+  ) {}
 
   async createBooking(clientId: number, dto: CreateToBookDto): Promise<ToBookEntity> {
     if (dto.isRecurring && !dto.recurringFrequency) {

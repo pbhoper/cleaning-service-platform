@@ -3,10 +3,12 @@ import { RatingService } from './rating.service';
 
 @Controller('rating')
 export class RatingController {
-  constructor(private readonly ratedService: RatingService) { }
+  constructor(private readonly ratedService: RatingService) {}
 
   @Post()
-  async rateCompany(@Body() body: { clientId: string; companyId: string; rating: number; comment?: string }) {
+  async rateCompany(
+    @Body() body: { clientId: string; companyId: string; rating: number; comment?: string },
+  ) {
     return await this.ratedService.createRating(body);
   }
 

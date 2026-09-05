@@ -8,7 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   HttpCode,
-  HttpStatus
+  HttpStatus,
 } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
@@ -19,28 +19,28 @@ export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
   @Post()
-  create(@Body() createClientDto: CreateClientDto) {
+  async create(@Body() createClientDto: CreateClientDto) {
     return this.clientService.create(createClientDto);
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.clientService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.clientService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateClientDto: UpdateClientDto) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateClientDto: UpdateClientDto) {
     return this.clientService.update(id, updateClientDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
     return this.clientService.remove(id);
   }
 }

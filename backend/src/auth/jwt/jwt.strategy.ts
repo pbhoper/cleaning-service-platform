@@ -24,6 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException('Токен недействителен или пользователь не найден');
     }
+
     return user;
   }
 }

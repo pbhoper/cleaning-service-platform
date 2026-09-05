@@ -44,7 +44,7 @@ export const DEFAULT_PRICING_CONFIG: PricingConfig = {
 export function calculateCleaning(
   rooms: RoomCounts,
   serviceType: string,
-  config: PricingConfig = DEFAULT_PRICING_CONFIG
+  config: PricingConfig = DEFAULT_PRICING_CONFIG,
 ) {
   const coeff = config.coefficients[serviceType] ?? 1.0;
 

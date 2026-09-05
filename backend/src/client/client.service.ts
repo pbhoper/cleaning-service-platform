@@ -33,6 +33,7 @@ export class ClientService {
     if (!client) {
       throw new NotFoundException(`Клиент с ID #${id} не найден`);
     }
+
     return client;
   }
 

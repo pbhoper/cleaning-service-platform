@@ -1,9 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 import { RecurringFrequency } from '../dto/create-to-book.dto';
 
 @Entity('bookings')
@@ -28,7 +23,7 @@ export class ToBookEntity {
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   recurringFrequency?: RecurringFrequency | string;
 

@@ -5,7 +5,7 @@ import {
   IsDateString,
   IsBoolean,
   IsOptional,
-  IsEnum
+  IsEnum,
 } from 'class-validator';
 
 export enum RecurringFrequency {

@@ -8,6 +8,6 @@ import { ToBookEntity } from './entities/to-book.entity';
   imports: [TypeOrmModule.forFeature([ToBookEntity])],
   controllers: [ToBookController],
   providers: [ToBookService],
-  exports: [ToBookService]
+  exports: [ToBookService],
 })
-export class ToBookModule { }
+export class ToBookModule {}

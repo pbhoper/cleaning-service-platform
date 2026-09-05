@@ -61,6 +61,7 @@ export class CleaningCompanyService {
     if (!company) {
       throw new NotFoundException('Компания не найдена');
     }
+
     return company;
   }
 

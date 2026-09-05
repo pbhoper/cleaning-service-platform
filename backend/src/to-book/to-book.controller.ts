@@ -1,19 +1,13 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get
-} from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { ToBookService } from './to-book.service';
 import { CreateToBookDto } from './dto/create-to-book.dto';
 
 @Controller('booking')
 export class ToBookController {
-  constructor(private readonly toBookService: ToBookService) { }
+  constructor(private readonly toBookService: ToBookService) {}
 
   @Post()
   async createBooking(@Body() dto: CreateToBookDto) {
-
     const mockClientId = 1;
 
     return this.toBookService.createBooking(mockClientId, dto);

@@ -1,13 +1,10 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Booking } from './entities/booking.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
-import { UserRole} from "../user-role/entities/user.entity";
-import {BOOKING_STATUS, BookingStatus} from "./consts/booking.enum";
+import { UserRole } from '../user-role/entities/user.entity';
+import { BOOKING_STATUS, BookingStatus } from './consts/booking.enum';
 
 @Injectable()
 export class BookingService {
@@ -32,8 +29,11 @@ export class BookingService {
       return await this.bookingRepository.find();
     }
     if (user.role.name === 'CLEANING_SERVICE') {
-      return await this.bookingRepository.find({ where: [{ company: { id: user.id } }, { status: BOOKING_STATUS.PENDING }] });
+      return await this.bookingRepository.find({
+        where: [{ company: { id: user.id } }, { status: BOOKING_STATUS.PENDING }],
+      });
     }
+
     return await this.bookingRepository.find({ where: { client: { id: user.id } } });
   }
 

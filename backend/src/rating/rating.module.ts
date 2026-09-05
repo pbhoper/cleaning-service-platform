@@ -7,4 +7,4 @@ import { RatingController } from './rating.controller';
   providers: [RatingService],
   exports: [RatingService],
 })
-export class RatingModule { }
+export class RatingModule {}

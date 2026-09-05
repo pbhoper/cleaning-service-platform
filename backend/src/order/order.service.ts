@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { calculateCleaning, RoomCounts } from '../utils/cleaning-calculator';
-import {Order} from "./entity/order.entity";
-import {CreateOrderDto} from "./dto/order.dto";
+import { Order } from './entity/order.entity';
+import { CreateOrderDto } from './dto/order.dto';
 
 @Injectable()
 export class OrderService {

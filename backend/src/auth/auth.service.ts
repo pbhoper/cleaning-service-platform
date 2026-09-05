@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -17,10 +13,9 @@ import { CleaningCompanyService } from '../cleaning-company/cleaning-company.ser
 export class AuthService {
   constructor(
     @InjectRepository(Auth)
-    private authRepository: Repository<Auth>,
-    private jwtService: JwtService,
-    private cleaningCompanyService: CleaningCompanyService,
-
+    private readonly authRepository: Repository<Auth>,
+    private readonly jwtService: JwtService,
+    private readonly cleaningCompanyService: CleaningCompanyService,
   ) {}
 
   async register(dto: RegisterAuthDto) {
@@ -47,7 +42,6 @@ export class AuthService {
   }
 
   async login(dto: LoginAuthDto) {
-
     const user = await this.authRepository.findOne({ where: { email: dto.email } });
 
     if (user) {
@@ -122,6 +116,8 @@ export class AuthService {
   }
 
   private sendConfirmationEmail(email: string, token: string) {
-    console.log(`[EMAIL SEND MOCK] Ссылка для ${email}: http://localhost:3000/auth/confirm?token=${token}`);
+    console.log(
+      `[EMAIL SEND MOCK] Ссылка для ${email}: http://localhost:3000/auth/confirm?token=${token}`,
+    );
   }
 }

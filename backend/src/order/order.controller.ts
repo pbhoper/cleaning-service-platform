@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Patch, Param, Body, ParseIntPipe } from '@nestjs/common';
 import { OrderService } from './order.service';
-import {CreateOrderDto} from "./dto/order.dto";
-import {Order} from "./entity/order.entity";
+import { CreateOrderDto } from './dto/order.dto';
+import { Order } from './entity/order.entity';
 
 @Controller('order')
 export class OrderController {

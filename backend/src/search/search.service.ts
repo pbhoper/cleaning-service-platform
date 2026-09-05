@@ -2,16 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CleaningCompanyEntity } from '../cleaning-company/entities/cleaning-company.entity';
-import {Booking} from "../booking/entities/booking.entity";
-import {SearchQueryDto, SortBy} from "./dto/create-search.dto";
+import { Booking } from '../booking/entities/booking.entity';
+import { SearchQueryDto, SortBy } from './dto/create-search.dto';
 
 @Injectable()
 export class SearchService {
   constructor(
     @InjectRepository(CleaningCompanyEntity)
-    private companyRepository: Repository<CleaningCompanyEntity>,
+    private readonly companyRepository: Repository<CleaningCompanyEntity>,
     @InjectRepository(Booking)
-    private bookingRepository: Repository<Booking>,
+    private readonly bookingRepository: Repository<Booking>,
   ) {}
 
   async searchCompanies(query: SearchQueryDto) {

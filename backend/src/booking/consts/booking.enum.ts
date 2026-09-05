@@ -3,6 +3,6 @@ export const BOOKING_STATUS = {
   CONFIRMED: 'CONFIRMED',
   CANCELED: 'CANCELED',
   COMPLETED: 'COMPLETED',
-} as const
+} as const;
 
-  export type BookingStatus = (typeof BOOKING_STATUS)[keyof typeof BOOKING_STATUS];
+export type BookingStatus = (typeof BOOKING_STATUS)[keyof typeof BOOKING_STATUS];

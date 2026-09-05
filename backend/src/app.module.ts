@@ -6,12 +6,12 @@ import { ToBookModule } from './to-book/to-book.module';
 import { HistoryCleanModule } from './history-clean/history-clean.module';
 import { OrderModule } from './order/order.module';
 import { EmailSmsModule } from './email-sms/email-sms.module';
-import {CleaningCompanyModule} from "./cleaning-company/cleaning-company.module";
-import {TypeOrmModule} from "@nestjs/typeorm";
-import {AuthModule} from "./auth/auth.module";
-import {UserModule} from "./user-role/user.module";
-import { RatingModule } from "./rating/rating.module";
-import {ClientModule} from "./client/client.module";
+import { CleaningCompanyModule } from './cleaning-company/cleaning-company.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user-role/user.module';
+import { RatingModule } from './rating/rating.module';
+import { ClientModule } from './client/client.module';
 
 @Module({
   imports: [
