@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+
+COMMIT_MSG_FILE=$1
+
+if [ -z "$COMMIT_MSG_FILE" ] || [ ! -s "$COMMIT_MSG_FILE" ]; then
+	echo "Commit message file is missing or empty."
+	exit 1
+fi
+
+COMMIT_MESSAGE=$(sed '/^[[:space:]]*#/d' "$COMMIT_MSG_FILE" | sed '/^[[:space:]]*$/d')
+
+if [ -z "$COMMIT_MESSAGE" ]; then
+	echo "Commit message must contain non-comment text."
+	exit 1
+fi
+
+SUBJECT=$(printf '%s\n' "$COMMIT_MESSAGE" | sed -n '1p')
+
+case "$SUBJECT" in
+	Merge\ *) exit 0 ;;
+esac
+
+if ! printf '%s\n' "$SUBJECT" | grep -Eq \
+	'^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert):[[:space:]]+[^[:space:]].*$'; then
+	echo "Invalid commit message. Use: type: description"
+	echo "Allowed types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
+	exit 1
+fi
