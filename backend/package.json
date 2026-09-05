@@ -24,7 +24,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "eslint:run": "npx eslint .",
     "eslint:fix": "npx eslint . --fix",
-    "prepare": "husky"
+    "prepare": "cd .. && husky backend/.husky"
   },
   "dependencies": {
     "@nestjs/common": "^11.2.1",

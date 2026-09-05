@@ -2,14 +2,19 @@
 
 set -e
 
+HOOK_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PROJECT_DIR=$HOOK_DIR/..
+REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR -- \
   '*.js' '*.mjs' '*.cjs' '*.ts' '*.tsx' '*.json' '*.md')
 
 if [ -n "$STAGED_FILES" ]; then
   echo "Formatting staged files..."
-  npx --no-install prettier --write -- $STAGED_FILES
+  npx --prefix "$PROJECT_DIR" --no-install prettier --write -- $STAGED_FILES
   git add -- $STAGED_FILES
 fi
 
 echo "Linting the project..."
-npx --no-install eslint . --fix
+npx --prefix "$PROJECT_DIR" --no-install eslint "$PROJECT_DIR" --fix
