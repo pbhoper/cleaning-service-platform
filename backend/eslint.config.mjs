@@ -9,6 +9,9 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default defineConfig(
   {
+    ignores: ['.history/**'],
+  },
+  {
     files: ['**/*.{js,ts}'],
     extends: [js.configs.recommended, tseslint.configs.recommended],
     languageOptions: {
