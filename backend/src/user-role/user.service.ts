@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserRole } from './entities/user.entity';
@@ -7,7 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from './enum/user.enum';
 
 @Injectable()
-export class UserService {
+export class UserService implements OnModuleInit {
   constructor(
     @InjectRepository(UserRole)
     private readonly userRoleRepository: Repository<UserRole>,
@@ -23,11 +23,11 @@ export class UserService {
     }
 
     const newRole = this.userRoleRepository.create(createUserRoleDto);
-    return await this.userRoleRepository.save(newRole);
+    return this.userRoleRepository.save(newRole);
   }
 
   async findAll(): Promise<UserRole[]> {
-    return await this.userRoleRepository.find();
+    return this.userRoleRepository.find();
   }
 
   async findOne(id: number): Promise<UserRole> {
@@ -42,7 +42,7 @@ export class UserService {
   async update(id: number, updateUserRoleDto: UpdateUserDto): Promise<UserRole> {
     const role = await this.findOne(id);
     Object.assign(role, updateUserRoleDto);
-    return await this.userRoleRepository.save(role);
+    return this.userRoleRepository.save(role);
   }
 
   async remove(id: number): Promise<void> {
@@ -50,7 +50,7 @@ export class UserService {
     await this.userRoleRepository.remove(role);
   }
 
-  async onModuleInit() {
+  async onModuleInit(): Promise<void> {
     const count = await this.userRoleRepository.count();
     if (count === 0) {
       await this.userRoleRepository.save([

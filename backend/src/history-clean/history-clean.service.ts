@@ -1,8 +1,29 @@
 import { Injectable } from '@nestjs/common';
 
+export interface CleaningHistoryItem {
+  id: number;
+  userId: number;
+  companyId: number;
+  companyName: string;
+  serviceType: string;
+  address: string;
+  smallRooms: number;
+  largeRooms: number;
+  bathrooms: number;
+  price: number;
+  estimatedTimeMinutes: number;
+  status: string;
+  createdAt: string;
+}
+
+export interface HistoryResponse {
+  success: boolean;
+  data: CleaningHistoryItem[];
+}
+
 @Injectable()
 export class HistoryCleanService {
-  private readonly cleaningHistory = [
+  private readonly cleaningHistory: CleaningHistoryItem[] = [
     {
       id: 1,
       userId: 1,
@@ -35,9 +56,8 @@ export class HistoryCleanService {
     },
   ];
 
-  async getHistoryByUserId(userId: number) {
+  getHistoryByUserId(userId: number): HistoryResponse {
     const userOrders = this.cleaningHistory.filter((order) => order.userId === Number(userId));
-
     return {
       success: true,
       data: userOrders,

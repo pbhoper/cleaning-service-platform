@@ -6,6 +6,13 @@ import * as bcrypt from 'bcrypt';
 import { CleaningCompanyEntity } from './entities/cleaning-company.entity';
 import { CreateCleaningCompanyDto } from './dto/create-cleaning-company.dto';
 
+export interface CreateCompanyResponse {
+  token: string;
+  accessToken: string;
+  userRole: string;
+  company: Omit<CleaningCompanyEntity, 'password'>;
+}
+
 @Injectable()
 export class CleaningCompanyService {
   constructor(
@@ -14,7 +21,7 @@ export class CleaningCompanyService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async create(dto: CreateCleaningCompanyDto) {
+  async create(dto: CreateCleaningCompanyDto): Promise<CreateCompanyResponse> {
     const existing = await this.companyRepository.findOne({
       where: { email: dto.email },
     });
@@ -38,18 +45,19 @@ export class CleaningCompanyService {
     };
 
     const token = this.jwtService.sign(payload);
-    const { password, ...companyData } = savedCompany;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _password, ...companyData } = savedCompany;
 
     return {
       token,
-      access_token: token,
-      user_role: savedCompany.role,
+      accessToken: token,
+      userRole: savedCompany.role,
       company: companyData,
     };
   }
 
   async findAll(): Promise<CleaningCompanyEntity[]> {
-    return await this.companyRepository.find();
+    return this.companyRepository.find();
   }
 
   async findByEmail(email: string): Promise<CleaningCompanyEntity | null> {
@@ -73,6 +81,6 @@ export class CleaningCompanyService {
     }
 
     this.companyRepository.merge(company, dto);
-    return await this.companyRepository.save(company);
+    return this.companyRepository.save(company);
   }
 }

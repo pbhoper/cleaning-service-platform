@@ -5,6 +5,38 @@ import { CleaningCompanyEntity } from '../cleaning-company/entities/cleaning-com
 import { Booking } from '../booking/entities/booking.entity';
 import { SearchQueryDto, SortBy } from './dto/create-search.dto';
 
+export interface RawSearchResult {
+  id: number;
+  name: string;
+  logo?: string | null;
+  address?: string | null;
+  rating?: string | number | null;
+  pricePerSqM?: string | number | null;
+  popularity?: string | number | null;
+  distance?: string | number | null;
+}
+
+export interface SearchResultItem {
+  id: number;
+  name: string;
+  logo: string | null;
+  address: string;
+  rating: number;
+  estimatedPrice: number;
+  distanceKm: number | null;
+  popularity: number;
+}
+
+export interface SearchResponse {
+  items: SearchResultItem[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+  };
+}
+
 @Injectable()
 export class SearchService {
   constructor(
@@ -14,7 +46,7 @@ export class SearchService {
     private readonly bookingRepository: Repository<Booking>,
   ) {}
 
-  async searchCompanies(query: SearchQueryDto) {
+  async searchCompanies(query: SearchQueryDto): Promise<SearchResponse> {
     const {
       lat,
       lng,
@@ -60,10 +92,10 @@ export class SearchService {
 
     qb.offset(skip).limit(limit);
 
-    const rawItems = await qb.getRawMany();
+    const rawItems = await qb.getRawMany<RawSearchResult>();
     const total = await this.companyRepository.count();
 
-    const items = rawItems.map((c) => ({
+    const items: SearchResultItem[] = rawItems.map((c) => ({
       id: c.id,
       name: c.name,
       logo: c.logo || null,

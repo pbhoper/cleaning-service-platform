@@ -17,7 +17,7 @@ export class ToBookService {
     }
 
     const newBooking = this.toBookRepository.create({
-      clientId: clientId,
+      clientId,
       companyId: dto.companyId,
       address: dto.address,
       bookingDate: dto.bookingDate,
@@ -26,12 +26,12 @@ export class ToBookService {
       status: 'PENDING',
     });
 
-    return await this.toBookRepository.save(newBooking);
+    return this.toBookRepository.save(newBooking);
   }
 
   async getClientBookings(clientId: number): Promise<ToBookEntity[]> {
-    return await this.toBookRepository.find({
-      where: { clientId: clientId },
+    return this.toBookRepository.find({
+      where: { clientId },
       order: { bookingDate: 'DESC' },
     });
   }

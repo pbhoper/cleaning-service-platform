@@ -21,11 +21,11 @@ export class ClientService {
     }
 
     const client = this.clientRepository.create(createClientDto);
-    return await this.clientRepository.save(client);
+    return this.clientRepository.save(client);
   }
 
   async findAll(): Promise<Client[]> {
-    return await this.clientRepository.find();
+    return this.clientRepository.find();
   }
 
   async findOne(id: number): Promise<Client> {
@@ -49,13 +49,14 @@ export class ClientService {
       }
     }
 
-    const { username, ...dtoData } = updateClientDto;
-    if (username) {
-      dtoData.name = username;
+    const dtoData = { ...updateClientDto };
+    if (dtoData.username) {
+      dtoData.name = dtoData.username;
+      delete dtoData.username;
     }
 
     Object.assign(client, dtoData);
-    return await this.clientRepository.save(client);
+    return this.clientRepository.save(client);
   }
 
   async remove(id: number): Promise<void> {

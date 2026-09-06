@@ -9,16 +9,29 @@ export interface RatingItem {
   createdAt: Date;
 }
 
+export interface CreateRatingData {
+  clientId: string;
+  companyId: string;
+  rating: number;
+  comment?: string;
+}
+
+export interface CreateRatingResponse {
+  success: boolean;
+  message: string;
+  data: RatingItem;
+}
+
+export interface GetCompanyRatingsResponse {
+  success: boolean;
+  data: RatingItem[];
+}
+
 @Injectable()
 export class RatingService {
   private readonly ratings: RatingItem[] = [];
 
-  async createRating(rateData: {
-    clientId: string;
-    companyId: string;
-    rating: number;
-    comment?: string;
-  }) {
+  createRating(rateData: CreateRatingData): CreateRatingResponse {
     const newRating: RatingItem = {
       id: this.ratings.length + 1,
       ...rateData,
@@ -34,7 +47,7 @@ export class RatingService {
     };
   }
 
-  async getCompanyRatings(companyId: string) {
+  getCompanyRatings(companyId: string): GetCompanyRatingsResponse {
     const companyRatings = this.ratings.filter((r) => r.companyId === companyId);
     return {
       success: true,

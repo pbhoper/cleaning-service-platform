@@ -3,6 +3,14 @@ import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from './roles.decorator';
 import { Role } from '../enum/user.enum';
 
+interface RequestWithUser {
+  user?: {
+    role?: {
+      name: Role;
+    };
+  };
+}
+
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
@@ -17,7 +25,8 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const { user } = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<RequestWithUser>();
+    const user = request.user;
 
     if (!user?.role) {
       throw new ForbiddenException('У вас нет доступа к этому ресурсу');

@@ -13,34 +13,38 @@ import {
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
+import { Client } from './entities/client.entity';
 
 @Controller('clients')
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
   @Post()
-  async create(@Body() createClientDto: CreateClientDto) {
+  async create(@Body() createClientDto: CreateClientDto): Promise<Client> {
     return this.clientService.create(createClientDto);
   }
 
   @Get()
-  async findAll() {
+  async findAll(): Promise<Client[]> {
     return this.clientService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Client> {
     return this.clientService.findOne(id);
   }
 
   @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updateClientDto: UpdateClientDto) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateClientDto: UpdateClientDto,
+  ): Promise<Client> {
     return this.clientService.update(id, updateClientDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.clientService.remove(id);
   }
 }

@@ -21,20 +21,20 @@ export class BookingService {
       status: BOOKING_STATUS.PENDING,
     });
 
-    return await this.bookingRepository.save(booking);
+    return this.bookingRepository.save(booking);
   }
 
   async findAllForUser(user: UserRole): Promise<Booking[]> {
-    if (user.role.name === 'ADMIN') {
-      return await this.bookingRepository.find();
+    if (user.role?.name === 'ADMIN') {
+      return this.bookingRepository.find();
     }
-    if (user.role.name === 'CLEANING_SERVICE') {
-      return await this.bookingRepository.find({
+    if (user.role?.name === 'CLEANING_SERVICE') {
+      return this.bookingRepository.find({
         where: [{ company: { id: user.id } }, { status: BOOKING_STATUS.PENDING }],
       });
     }
 
-    return await this.bookingRepository.find({ where: { client: { id: user.id } } });
+    return this.bookingRepository.find({ where: { client: { id: user.id } } });
   }
 
   async updateStatus(id: string, status: BookingStatus, company: UserRole): Promise<Booking> {
@@ -51,6 +51,6 @@ export class BookingService {
     booking.status = status;
     booking.company = company;
 
-    return await this.bookingRepository.save(booking);
+    return this.bookingRepository.save(booking);
   }
 }

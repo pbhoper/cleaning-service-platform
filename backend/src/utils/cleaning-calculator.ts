@@ -18,6 +18,13 @@ export interface PricingConfig {
   coefficients: Record<string, number>;
 }
 
+export interface CleaningCalculationResult {
+  totalPrice: number;
+  totalTimeMinutes: number;
+  formattedTime: string;
+}
+
+/* eslint-disable @typescript-eslint/naming-convention */
 export const DEFAULT_PRICING_CONFIG: PricingConfig = {
   basePrices: {
     smallRoom: 800,
@@ -40,12 +47,13 @@ export const DEFAULT_PRICING_CONFIG: PricingConfig = {
     'Уборка бассейна': 2.5,
   },
 };
+/* eslint-enable @typescript-eslint/naming-convention */
 
 export function calculateCleaning(
   rooms: RoomCounts,
   serviceType: string,
   config: PricingConfig = DEFAULT_PRICING_CONFIG,
-) {
+): CleaningCalculationResult {
   const coeff = config.coefficients[serviceType] ?? 1.0;
 
   const basePrice =
@@ -64,7 +72,7 @@ export function calculateCleaning(
   const hours = Math.floor(totalTimeMinutes / 60);
   const minutes = totalTimeMinutes % 60;
 
-  let formattedTime = '';
+  let formattedTime: string;
   if (hours > 0 && minutes > 0) {
     formattedTime = `${hours} ч. ${minutes} мин.`;
   } else if (hours > 0) {

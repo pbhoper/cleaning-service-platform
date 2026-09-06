@@ -1,13 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateEmailSmDto } from './dto/create-email-sm.dto';
-import { EmailSmsEntity, NotificationType, NotificationStatus } from './entities/email-sm.entity';
 import * as nodemailer from 'nodemailer';
+import { CreateEmailSmDto } from './dto/create-email-sm.dto';
+import { EmailSmsEntity, NotificationStatus } from './entities/email-sm.entity';
 
 @Injectable()
 export class EmailSmsService {
-  private readonly transporter;
+  private readonly logger = new Logger(EmailSmsService.name);
+  private readonly transporter: nodemailer.Transporter;
 
   constructor(
     @InjectRepository(EmailSmsEntity)
@@ -23,7 +24,7 @@ export class EmailSmsService {
     });
   }
 
-  async create(createEmailSmDto: CreateEmailSmDto) {
+  async create(createEmailSmDto: CreateEmailSmDto): Promise<EmailSmsEntity> {
     const { type, recipient, message } = createEmailSmDto;
 
     let status = NotificationStatus.SUCCESS;
@@ -42,27 +43,27 @@ export class EmailSmsService {
         errorMessage = error instanceof Error ? error.message : 'Не удалось отправить email';
       }
     } else if (type === 'sms') {
-      console.log(`Отправка SMS на номер ${recipient}: ${message}`);
+      this.logger.log(`Отправка SMS на номер ${recipient}: ${message}`);
     }
 
     const notification = this.emailSmsRepository.create({
-      type: type,
+      type,
       recipient,
       message,
       status,
       errorMessage,
     });
 
-    return await this.emailSmsRepository.save(notification);
+    return this.emailSmsRepository.save(notification);
   }
 
-  async findAll() {
-    return await this.emailSmsRepository.find({
+  async findAll(): Promise<EmailSmsEntity[]> {
+    return this.emailSmsRepository.find({
       order: { createdAt: 'DESC' },
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<EmailSmsEntity> {
     const notification = await this.emailSmsRepository.findOneBy({ id });
     if (!notification) {
       throw new NotFoundException(`Уведомление #${id} не найдено`);
@@ -71,7 +72,7 @@ export class EmailSmsService {
     return notification;
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<{ success: boolean; message: string }> {
     const result = await this.emailSmsRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Уведомление #${id} не найдено`);
