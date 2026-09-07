@@ -17,10 +17,10 @@ import { ClientModule } from './client/client.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      host: 'postgres',
       port: 5432,
       username: 'postgres',
-      password: 'poiuytrewq123.com',
+      password: 'postgres',
       database: 'cleaning_db',
       autoLoadEntities: true,
       synchronize: true,

@@ -9,7 +9,7 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default defineConfig(
   {
-    ignores: ['.history/**'],
+    ignores: ['.history/**', 'dist/**', 'node_modules/**'],
   },
   {
     files: ['**/*.{js,ts}'],
