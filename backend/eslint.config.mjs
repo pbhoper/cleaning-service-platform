@@ -3,7 +3,6 @@
 import js from '@eslint/js';
 import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
-// 1. Import the Prettier plugin and config
 import eslintPluginPrettier from 'eslint-plugin-prettier';
 import eslintConfigPrettier from 'eslint-config-prettier';
 
@@ -16,13 +15,12 @@ export default defineConfig(
     extends: [js.configs.recommended, tseslint.configs.recommended],
     languageOptions: {
       parserOptions: {
-        projectService: true, // Автоматически находит ближайший tsconfig.json
-        tsconfigRootDir: import.meta.dirname, // Указывает на корневую папку проекта
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     plugins: { prettier: eslintPluginPrettier },
     rules: {
-      // Enforce consistent code formatting using Prettier
       'prettier/prettier': [
         'error',
         {
@@ -30,7 +28,6 @@ export default defineConfig(
         },
       ],
 
-      // Code Quality Rules
       curly: 'error',
       'no-await-in-loop': 'off',
       'no-underscore-dangle': 'warn',
@@ -38,8 +35,6 @@ export default defineConfig(
       'class-methods-use-this': 'off',
       'max-classes-per-file': 'off',
       'security/detect-object-injection': 'off',
-
-      // TypeScript-Specific Rules
       '@typescript-eslint/explicit-function-return-type': 'error',
       '@typescript-eslint/explicit-module-boundary-types': 'error',
       '@typescript-eslint/no-explicit-any': 'warn',
@@ -85,14 +80,9 @@ export default defineConfig(
         },
       ],
       'no-console': 'error',
-      // Require 'await' in async functions
       'require-await': 'off',
       '@typescript-eslint/require-await': 'warn',
-
-      // Enforce single quotes and allow template literals(should apply rule from .prettierrc)
       quotes: 'off',
-
-      // Disable rules that conflict with Prettier
       '@typescript-eslint/indent': 'off',
       'no-extra-parens': 'off',
       'no-restricted-imports': [
@@ -114,7 +104,5 @@ export default defineConfig(
       ],
     },
   },
-  // 3. We pass eslintConfigPrettier as a separate object at the very end of the defineConfig array.
-  // This turns off any formatting rules that fight with Prettier.
   eslintConfigPrettier,
 );

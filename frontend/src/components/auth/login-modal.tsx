@@ -28,7 +28,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
 
     try {
       if (isRegister) {
-        // 1. Логика Регистрации
         const response = await axios.post("/auth/register", {
           email: values.email,
           password: values.password,
