@@ -105,21 +105,24 @@ export class AuthService {
   }
 
   async socialLogin(profile: SocialProfile): Promise<AuthTokensResponse> {
-    let user = await this.authRepository.findOne({ where: { email: profile.email } });
+    const existingUser = await this.authRepository.findOne({ where: { email: profile.email } });
 
-    if (!user) {
-      user = this.authRepository.create({
-        email: profile.email,
-        firstName: profile.firstName ?? '',
-        lastName: profile.lastName ?? null,
-        provider: profile.provider ?? null,
-        providerId: profile.providerId ?? null,
-        isConfirmed: true,
-      });
-      await this.authRepository.save(user);
+    if (existingUser) {
+      return this.generateTokens(existingUser.id, existingUser.email, 'user');
     }
 
-    return this.generateTokens(user.id, user.email, 'user');
+    const newUser = this.authRepository.create({
+      email: profile.email,
+      firstName: profile.firstName ?? '',
+      lastName: profile.lastName ?? null,
+      provider: profile.provider ?? null,
+      providerId: profile.providerId ?? null,
+      isConfirmed: true,
+    });
+
+    const savedUser = await this.authRepository.save(newUser);
+
+    return this.generateTokens(savedUser.id, savedUser.email, 'user');
   }
 
   private generateTokens(
